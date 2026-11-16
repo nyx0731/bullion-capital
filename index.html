@@ -32,11 +32,14 @@ header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1
 .dot{width:9px;height:9px;border-radius:50%;background:var(--up);box-shadow:0 0 0 0 rgba(47,214,139,.6);animation:p 1.6s infinite}
 .dot.off{background:#7a7a7a;animation:none}
 @keyframes p{70%{box-shadow:0 0 0 10px rgba(47,214,139,0)}100%{box-shadow:0 0 0 0 rgba(47,214,139,0)}}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:22px 0}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.tile .k{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
-.tile .v{font-size:24px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
-.gold .v{color:var(--gold2)}
+.ticker{margin:18px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.track{display:inline-flex;animation:run 40s linear infinite}
+.ticker:hover .track{animation-play-state:paused}
+.ti{display:inline-flex;align-items:baseline;gap:8px;padding:12px 26px;border-right:1px solid var(--line)}
+.ti .k{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.ti .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.ti.gold .v{color:var(--gold2)}
+@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}.gold .v{color:var(--gold2)}
 .up{color:var(--up)}.dn{color:var(--dn)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:14px}
 .card h2{margin:0 0 12px;font-size:16px;color:var(--gold2);font-weight:600}
@@ -74,14 +77,7 @@ footer{color:var(--mut);font-size:12px;margin-top:22px}
     </section>
     <div class="live"><span class="dot off" id="dot"></span><span id="upd">carregando…</span></div>
   </header>
-  <div class="tiles">
-    <div class="tile gold"><div class="k">Lucro desde <span id="ini">—</span></div><div class="v" id="lucro">—</div></div>
-    <div class="tile gold"><div class="k">Crescimento da conta</div><div class="v" id="cresc">—</div></div>
-    <div class="tile"><div class="k">Saldo</div><div class="v" id="saldo">—</div></div>
-    <div class="tile"><div class="k">Patrimônio (ao vivo)</div><div class="v" id="patr">—</div></div>
-    <div class="tile"><div class="k">Acerto</div><div class="v" id="acerto">—</div></div>
-    <div class="tile"><div class="k">Operações</div><div class="v" id="nops">—</div></div>
-  </div>
+  <div class="ticker"><div class="track" id="tick"></div></div>
 
   <div class="card chartc">
     <div class="ch"><h2>Gráfico do ouro · 15 minutos</h2><div class="leg"><i style="background:#d4af37"></i>Canal de abertura do dia <i style="background:#2fd68b"></i>Alvo <i style="background:#ff5d6c"></i>Stop</div></div>
@@ -173,14 +169,16 @@ function render(d) {
   if (d.ca) { const ch = d.preco.bid - d.ca.abertura;
     $("pxchg").innerHTML = `<span class="${cls(ch)}">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(2)} (${(100 * ch / d.ca.abertura).toFixed(2)}%)</span> no dia`; }
   drawChart(d);
-  $("ini").textContent = d.inicio.split("-").reverse().slice(0, 2).join("/");
-  $("lucro").textContent = sgn(lucro); $("lucro").className = "v";
-  $("cresc").textContent = (lucro >= 0 ? "+" : "") + (100 * lucro / d.base).toFixed(1) + "%";
-  $("saldo").textContent = usd(d.saldo);
-  $("patr").innerHTML = usd(d.patrimonio) + (d.patrimonio !== d.saldo ? ` <small class="${cls(d.patrimonio - d.saldo)}">(${sgn(d.patrimonio - d.saldo)})</small>` : "");
-  $("acerto").textContent = ops.length ? Math.round(100 * wins / ops.length) + "%" : "—";
-  $("nops").textContent = ops.length + (d.abertas.length ? " + " + d.abertas.length + " aberta" : "");
-
+  const pz = d.patrimonio - d.saldo, items = [
+    ["gold", "Lucro desde " + d.inicio.split("-").reverse().slice(0, 2).join("/"), sgn(lucro)],
+    ["gold", "Crescimento da conta", (lucro >= 0 ? "+" : "") + (100 * lucro / d.base).toFixed(1) + "%"],
+    ["", "Saldo", usd(d.saldo)],
+    ["", "Patrimônio ao vivo", usd(d.patrimonio) + (pz ? ` <small class="${cls(pz)}">(${sgn(pz)})</small>` : "")],
+    ["", "Acerto", ops.length ? Math.round(100 * wins / ops.length) + "%" : "—"],
+    ["", "Operações", ops.length + (d.abertas.length ? " + " + d.abertas.length + " aberta" : "")],
+    ["", "Ouro", "$" + d.preco.bid.toLocaleString("pt-BR", {minimumFractionDigits: 2})],
+  ].map(([c, k, v]) => `<span class="ti ${c}"><span class="k">${k}</span><span class="v">${v}</span></span>`).join("");
+  $("tick").innerHTML = items + items;
   $("abertas").className = d.abertas.length ? "" : "none";
   $("abertas").innerHTML = d.abertas.length ? d.abertas.map(p => {
     const pct = Math.min(100, Math.max(0, 100 * (p.preco_atual - p.sl) / (p.tp - p.sl)));
