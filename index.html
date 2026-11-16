@@ -33,13 +33,13 @@ header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1
 .dot.off{background:#7a7a7a;animation:none}
 @keyframes p{70%{box-shadow:0 0 0 10px rgba(47,214,139,0)}100%{box-shadow:0 0 0 0 rgba(47,214,139,0)}}
 .ticker{margin:18px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-.track{display:inline-flex;animation:run 40s linear infinite}
-.ticker:hover .track{animation-play-state:paused}
+.track{display:inline-flex;will-change:transform}
+.ticker{touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}.ticker.drag{cursor:grabbing}
 .ti{display:inline-flex;align-items:baseline;gap:8px;padding:12px 26px;border-right:1px solid var(--line)}
 .ti .k{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
 .ti .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
 .ti.gold .v{color:var(--gold2)}
-@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}.gold .v{color:var(--gold2)}
+.gold .v{color:var(--gold2)}
 .up{color:var(--up)}.dn{color:var(--dn)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:14px}
 .card h2{margin:0 0 12px;font-size:16px;color:var(--gold2);font-weight:600}
@@ -211,6 +211,29 @@ function render(d) {
     <path d="${path}" fill="none" stroke="#d4af37" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
     ${pts.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="4" fill="${v >= pts[i] ? "#2fd68b" : "#ff5d6c"}"/>`).join("")}`;
 }
+
+// faixa corrida: anda sozinha e pode ser arrastada para os dois lados (mouse ou dedo)
+const tk = {x: 0, drag: false, lx: 0, lt: 0, v: 0, last: 0};
+function tickerLoop(ts) {
+  const dt = tk.last ? Math.min(50, ts - tk.last) : 16; tk.last = ts;
+  const tr = $("tick"), half = tr.scrollWidth / 2;
+  if (!tk.drag) {
+    if (Math.abs(tk.v) > 0.06) { tk.x += tk.v * dt; tk.v *= Math.pow(0.94, dt / 16); }
+    else { tk.v = 0; tk.x -= 0.05 * dt; }
+  }
+  if (half > 0) { tk.x %= half; if (tk.x > 0) tk.x -= half; }
+  tr.style.transform = `translate3d(${tk.x}px,0,0)`;
+  requestAnimationFrame(tickerLoop);
+}
+(() => {
+  const el = document.querySelector(".ticker");
+  el.addEventListener("pointerdown", e => { tk.drag = true; tk.lx = e.clientX; tk.lt = performance.now(); tk.v = 0; el.classList.add("drag"); el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => { if (!tk.drag) return; const now = performance.now(), dx = e.clientX - tk.lx;
+    tk.x += dx; tk.v = dx / Math.max(8, now - tk.lt); tk.lx = e.clientX; tk.lt = now; });
+  const up = () => { tk.drag = false; el.classList.remove("drag"); };
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  requestAnimationFrame(tickerLoop);
+})();
 
 load(); setInterval(load, 30000); setInterval(tick, 5000);
 </script>
