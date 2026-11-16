@@ -116,10 +116,8 @@ function render(d) {
 
   $("abertas").className = d.abertas.length ? "" : "none";
   $("abertas").innerHTML = d.abertas.length ? d.abertas.map(p => {
-    const lo = Math.min(p.sl, p.tp), hi = Math.max(p.sl, p.tp);
-    const pct = Math.min(100, Math.max(0, 100 * (p.preco_atual - lo) / (hi - lo)));
-    const left = p.lado === "Compra" ? "Stop " + p.sl : "Alvo " + p.tp, right = p.lado === "Compra" ? "Alvo " + p.tp : "Stop " + p.sl;
-    const flip = p.lado === "Venda" ? "transform:scaleX(-1)" : "";
+    const pct = Math.min(100, Math.max(0, 100 * (p.preco_atual - p.sl) / (p.tp - p.sl)));
+    const left = "Stop " + p.sl, right = "Alvo " + p.tp, flip = "";
     return `<div class="pos">
       <div><div class="k">Resultado agora</div><div class="pnl ${cls(p.lucro)}">${sgn(p.lucro)}</div></div>
       <div><div class="k">Lado</div><div class="v"><span class="pill ${p.lado === "Compra" ? "a" : "s"}">${p.lado}</span> ${p.lote} lote</div></div>
