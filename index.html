@@ -109,14 +109,15 @@ function initChart() {
   if (chart || !window.LightweightCharts) return;
   const el = document.getElementById("chart");
   chart = LightweightCharts.createChart(el, {
-    autoSize: true,
+    width: el.clientWidth || 800, height: el.clientHeight || 420,
     layout: {background: {color: "transparent"}, textColor: "#8fb3a2", fontFamily: "Inter"},
     grid: {vertLines: {color: "rgba(29,68,52,.45)"}, horzLines: {color: "rgba(29,68,52,.45)"}},
     rightPriceScale: {borderColor: "#1d4434"},
-    timeScale: {borderColor: "#1d4434", timeVisible: true, secondsVisible: false, rightOffset: 4},
+    timeScale: {borderColor: "#1d4434", timeVisible: true, secondsVisible: false, rightOffset: 4, barSpacing: innerWidth < 600 ? 6 : 9},
     crosshair: {mode: 0},
     localization: {locale: "pt-BR"},
   });
+  addEventListener("resize", () => chart.resize(el.clientWidth, el.clientHeight));
   series = chart.addCandlestickSeries({upColor: "#2fd68b", downColor: "#ff5d6c", borderVisible: false,
     wickUpColor: "#2fd68b", wickDownColor: "#ff5d6c"});
 }
@@ -141,7 +142,7 @@ function drawChart(d) {
   (d.abertas || []).forEach(p => { const buy = p.lado === "Compra";
     mk.push({time: q(p.entrada), position: buy ? "belowBar" : "aboveBar", color: "#f3d77a", shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
   series.setMarkers(mk.sort((a, b) => a.time - b.time));
-  if (!drawChart.done) { const n = d.m15.length; setTimeout(() => chart.timeScale().setVisibleLogicalRange({from: n - (innerWidth < 600 ? 50 : 110), to: n + 3}), 80); drawChart.done = true; }
+  
 }
 const GIST = "71311f75b9108ad18027bebe14ecc19c";
 const $ = id => document.getElementById(id);
