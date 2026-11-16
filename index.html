@@ -14,12 +14,12 @@
 body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#123a2a 0,transparent 60%),var(--bg);color:var(--txt);font:15px/1.5 Inter,system-ui,sans-serif}
 .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;font:700 20px "Playfair Display",serif;color:var(--gold2)}
-.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:34px 0 8px;padding:28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#0f2c21 0,#0a1f17 60%,#14301f 100%);position:relative;overflow:hidden}
+.logo{display:flex;align-items:center;gap:14px;font:700 clamp(32px,5.5vw,48px)/1.1 "Playfair Display",serif;letter-spacing:.5px}.logo span{background:linear-gradient(90deg,#f7e7a1,#d4af37 45%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:22px 0 8px;padding:24px 28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#0f2c21 0,#0a1f17 60%,#14301f 100%);position:relative;overflow:hidden}
 .hero:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)}
 .hero h1{margin:0;font:700 clamp(40px,7vw,68px)/1.05 "Playfair Display",serif;background:linear-gradient(90deg,#f7e7a1,#d4af37 45%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.5px}
 .hero h1 span{font-weight:700}
-.tag{color:var(--mut);margin:8px 0 14px;font-size:16px}
+.tag{color:var(--txt);margin:0 0 14px;font-size:18px}
 .quote{text-align:right;position:relative;z-index:1}
 .quote .px{font-size:38px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--txt)}
 .quote .k{color:var(--mut);font-size:13px}
@@ -62,13 +62,12 @@ footer{color:var(--mut);font-size:12px;margin-top:22px}
 <body>
 <div class="wrap">
   <header>
-    <div class="logo"><svg viewBox="0 0 32 32" width="34" height="34"><rect width="32" height="32" rx="8" fill="#0f2c21" stroke="#d4af37" stroke-opacity=".5"/><path d="M6 23h20l-3.5-9h-13z" fill="#d4af37"/><path d="M11 13h10l-2-5h-6z" fill="#f3d77a"/></svg><span>Bullion Capital</span></div>
+    <div class="logo"><svg viewBox="0 0 32 32" width="58" height="58"><rect width="32" height="32" rx="8" fill="#0f2c21" stroke="#d4af37" stroke-opacity=".5"/><path d="M6 23h20l-3.5-9h-13z" fill="#d4af37"/><path d="M11 13h10l-2-5h-6z" fill="#f3d77a"/></svg><span>Bullion Capital</span></div>
     <div class="live"><span class="dot off" id="dot"></span><span id="upd">carregando…</span></div>
   </header>
 
   <section class="hero">
     <div>
-      <h1>Bullion <span>Capital</span></h1>
       <p class="tag">Robô de trading no ouro · resultados reais acompanhados ao vivo</p>
       <span class="badge">Robô FIMATHE · XAUUSD · <span id="conta">—</span> · <span id="ver">—</span></span>
     </div>
