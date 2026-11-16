@@ -15,19 +15,18 @@ body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#123a2a 0,tran
 .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:14px;font:700 clamp(32px,5.5vw,48px)/1.1 "Playfair Display",serif;letter-spacing:.5px}.logo span{background:linear-gradient(90deg,#f7e7a1,#d4af37 45%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin:22px 0 8px;padding:24px 28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#0f2c21 0,#0a1f17 60%,#14301f 100%);position:relative;overflow:hidden}
-.hero:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)}
-.hero h1{margin:0;font:700 clamp(40px,7vw,68px)/1.05 "Playfair Display",serif;background:linear-gradient(90deg,#f7e7a1,#d4af37 45%,#b8860b);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.5px}
-.hero h1 span{font-weight:700}
-.tag{color:var(--txt);margin:0 0 14px;font-size:18px}
-.quote{text-align:right;position:relative;z-index:1}
-.quote .px{font-size:38px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--txt)}
-.quote .k{color:var(--mut);font-size:13px}
-.chartc .ch{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#0f2c21 0,#0a1f17 60%,#14301f 100%);max-width:620px;justify-self:center;width:100%}
+.hero .tag{color:var(--txt);margin:0 0 6px;font-size:13px}
+.hero .badge{font-size:11px;padding:2px 9px}
+.quote{text-align:right}
+.quote .px{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.quote .k{color:var(--mut);font-size:11px}
+@media (max-width:900px){header{grid-template-columns:1fr auto}.hero{grid-column:1/-1;grid-row:2;max-width:none}}.chartc .ch{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .leg{color:var(--mut);font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .leg i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-left:8px}
 #chart{height:420px;margin-top:6px}
-@media (max-width:600px){.quote{text-align:left}#chart{height:320px}.hero{padding:20px}}
+@media (max-width:600px){#chart{height:320px}}
 .badge{border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--mut);font-size:13px}
 .live{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--up);box-shadow:0 0 0 0 rgba(47,214,139,.6);animation:p 1.6s infinite}
@@ -63,21 +62,19 @@ footer{color:var(--mut);font-size:12px;margin-top:22px}
 <div class="wrap">
   <header>
     <div class="logo"><svg viewBox="0 0 32 32" width="58" height="58"><rect width="32" height="32" rx="8" fill="#0f2c21" stroke="#d4af37" stroke-opacity=".5"/><path d="M6 23h20l-3.5-9h-13z" fill="#d4af37"/><path d="M11 13h10l-2-5h-6z" fill="#f3d77a"/></svg><span>Bullion</span></div>
+    <section class="hero">
+      <div class="hl">
+        <p class="tag">Robô de trading no ouro · resultados reais ao vivo</p>
+        <span class="badge">Robô FIMATHE · XAUUSD · <span id="conta">—</span> · <span id="ver">—</span></span>
+      </div>
+      <div class="quote">
+        <div class="k">Ouro / Dólar (XAUUSD)</div>
+        <div class="px" id="px">—</div>
+        <div id="pxchg" class="k">—</div>
+      </div>
+    </section>
     <div class="live"><span class="dot off" id="dot"></span><span id="upd">carregando…</span></div>
   </header>
-
-  <section class="hero">
-    <div>
-      <p class="tag">Robô de trading no ouro · resultados reais acompanhados ao vivo</p>
-      <span class="badge">Robô FIMATHE · XAUUSD · <span id="conta">—</span> · <span id="ver">—</span></span>
-    </div>
-    <div class="quote">
-      <div class="k">Ouro / Dólar (XAUUSD)</div>
-      <div class="px" id="px">—</div>
-      <div id="pxchg" class="k">—</div>
-    </div>
-  </section>
-
   <div class="card chartc">
     <div class="ch"><h2>Gráfico do ouro · 15 minutos</h2><div class="leg"><i style="background:#d4af37"></i>Canal de abertura do dia <i style="background:#2fd68b"></i>Alvo <i style="background:#ff5d6c"></i>Stop</div></div>
     <div id="chart"></div>
