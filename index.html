@@ -149,23 +149,17 @@ const usd = v => (v < 0 ? "-" : "") + "$" + Math.abs(v).toLocaleString("pt-BR", 
 const sgn = v => (v > 0 ? "+" : "") + usd(v);
 const cls = v => v > 0 ? "up" : v < 0 ? "dn" : "";
 const dt = s => new Date(s).toLocaleString("pt-BR", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
-let etag = null, data = null;
+let data = null;
 
 async function load() {
+  // raw do gist (sem limite de 60/h da API); o ?t= evita o cache
   try {
-    const h = etag ? {"If-None-Match": etag} : {};
-    const r = await fetch("https://api.github.com/gists/" + GIST, {headers: h, cache: "no-store"});
-    if (r.status === 200) {
-      etag = r.headers.get("ETag");
-      const g = await r.json(), f = g.files["live.json"];
-      const txt = f.truncated ? await (await fetch(f.raw_url, {cache: "no-store"})).text() : f.content;
-      data = JSON.parse(txt);
-    }
+    const r = await fetch("https://gist.githubusercontent.com/nyx0731/" + GIST + "/raw/live.json?t=" + Date.now(), {cache: "no-store"});
+    if (r.ok) data = JSON.parse(await r.text());
   } catch (e) { console.warn(e); }
   if (data && data.saldo !== undefined) render(data);
   tick();
 }
-
 function tick() {
   if (!data || !data.enviado) return;
   const age = (Date.now() - new Date(data.enviado)) / 1000;
@@ -224,7 +218,7 @@ function render(d) {
     ${pts.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="4" fill="${v >= pts[i] ? "#2fd68b" : "#ff5d6c"}"/>`).join("")}`;
 }
 
-load(); setInterval(load, 75000); setInterval(tick, 5000);
+load(); setInterval(load, 30000); setInterval(tick, 5000);
 </script>
 </body>
 </html>
