@@ -141,7 +141,7 @@ function drawChart(d) {
   (d.abertas || []).forEach(p => { const buy = p.lado === "Compra";
     mk.push({time: q(p.entrada), position: buy ? "belowBar" : "aboveBar", color: "#f3d77a", shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
   series.setMarkers(mk.sort((a, b) => a.time - b.time));
-  if (!drawChart.done) { chart.timeScale().setVisibleLogicalRange({from: d.m15.length - 110, to: d.m15.length + 3}); drawChart.done = true; }
+  if (!drawChart.done) { const n = d.m15.length; setTimeout(() => chart.timeScale().setVisibleLogicalRange({from: n - (innerWidth < 600 ? 50 : 110), to: n + 3}), 80); drawChart.done = true; }
 }
 const GIST = "71311f75b9108ad18027bebe14ecc19c";
 const $ = id => document.getElementById(id);
