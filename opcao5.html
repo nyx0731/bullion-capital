@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04110c">
+<title>Bullion</title>
+<meta name="description" content="Resultados ao vivo do robô FIMATHE no ouro (XAUUSD M5).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230b2a1f'/%3E%3Cpath d='M7 22h18l-3-8H10z' fill='%23e2bf5a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#020806;--bg1:#04140e;--bg2:#08281c;
+  --glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.085);
+  --edge:rgba(255,255,255,.12);--edge2:rgba(255,255,255,.06);
+  --txt:#eef6f1;--mut:rgba(214,232,223,.62);--mut2:rgba(214,232,223,.42);
+  --gold:#e2bf5a;--gold2:#f6dc8c;--gold3:#b98d26;
+  --up:#3ee0a3;--dn:#ff6b7a;
+  --r:26px;--r2:18px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{overflow-x:hidden}
+body{margin:0;min-height:100vh;color:var(--txt);font:15px/1.5 Manrope,system-ui,-apple-system,sans-serif;
+  background:linear-gradient(165deg,var(--bg2) 0%,var(--bg1) 38%,var(--bg0) 100%) fixed;background-color:var(--bg0);
+  -webkit-font-smoothing:antialiased}
+/* blobs dourados desfocados */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.glow b{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+.glow b:nth-child(1){width:420px;height:420px;left:-140px;top:-120px;background:radial-gradient(circle,#c99a2e 0,rgba(201,154,46,0) 70%);animation:fl1 22s ease-in-out infinite alternate}
+.glow b:nth-child(2){width:360px;height:360px;right:-120px;top:32%;background:radial-gradient(circle,#e9c867 0,rgba(233,200,103,0) 70%);opacity:.32;animation:fl2 26s ease-in-out infinite alternate}
+.glow b:nth-child(3){width:480px;height:480px;left:20%;bottom:-220px;background:radial-gradient(circle,#0f6b47 0,rgba(15,107,71,0) 70%);opacity:.6;animation:fl1 30s ease-in-out infinite alternate-reverse}
+@keyframes fl1{to{transform:translate(60px,40px) scale(1.08)}}
+@keyframes fl2{to{transform:translate(-50px,-30px) scale(.94)}}
+@media (prefers-reduced-motion:reduce){.glow b{animation:none}}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 16px 40px}
+.glass{background:linear-gradient(155deg,var(--glass2),var(--glass) 55%,rgba(255,255,255,.03));
+  border:1px solid var(--edge);border-radius:var(--r);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 20px 50px -24px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.10)}
+
+/* header */
+header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:12px;font:700 clamp(34px,5.4vw,46px)/1 "Cormorant Garamond",Georgia,serif;letter-spacing:.4px}
+.logo svg{flex:none;filter:drop-shadow(0 6px 18px rgba(226,191,90,.35))}
+.logo span{background:linear-gradient(100deg,#fff1bf 0%,#e9c867 40%,#b98d26 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px 8px 16px;border-radius:20px;max-width:640px;width:100%;justify-self:center}
+.hero .hl{min-width:0}
+.hero .tag{margin:0;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--txt)}
+.hero .badge{display:block;font-size:10.5px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quote{text-align:right;flex:none;padding:6px 12px;border-radius:14px;background:rgba(226,191,90,.08);border:1px solid rgba(226,191,90,.22)}
+.quote .px{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15;color:var(--gold2)}
+.quote .k{color:var(--mut);font-size:10.5px;line-height:1.25;white-space:nowrap}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--mut);padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--edge2);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--up);box-shadow:0 0 0 0 rgba(62,224,163,.6);animation:p 1.6s infinite;flex:none}
+.dot.off{background:#7a8580;animation:none}
+@keyframes p{70%{box-shadow:0 0 0 9px rgba(62,224,163,0)}100%{box-shadow:0 0 0 0 rgba(62,224,163,0)}}
+@media (max-width:900px){header{grid-template-columns:1fr auto;gap:14px}.hero{grid-column:1/-1;grid-row:2;max-width:none}}
+@media (max-width:420px){header{grid-template-columns:auto minmax(0,1fr);gap:12px}.logo{gap:9px;font-size:32px}.logo svg{width:42px;height:42px}.live{justify-self:end;min-width:0;max-width:100%;padding:6px 10px;font-size:11px;gap:6px}.live #upd{min-width:0;overflow:hidden;text-overflow:ellipsis}}
+
+/* ticker */
+.ticker{margin:16px 0 0;border-radius:20px;overflow:hidden;white-space:nowrap;padding:0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.ticker.drag{cursor:grabbing}
+.track{display:inline-flex;will-change:transform}
+.ti{display:inline-flex;flex-direction:column;justify-content:center;gap:1px;padding:12px 26px;position:relative}
+.ti:after{content:"";position:absolute;right:0;top:22%;bottom:22%;width:1px;background:rgba(255,255,255,.1)}
+.ti .k{color:var(--mut2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.9px}
+.ti .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.ti .v small{font-size:12px;font-weight:700}
+.gold .v{color:var(--gold2)}
+.up{color:var(--up)}.dn{color:var(--dn)}
+
+/* cards */
+.card{padding:20px;margin-top:14px}
+.card h2{display:flex;align-items:center;gap:9px;margin:0 0 14px;font-size:15px;font-weight:700;letter-spacing:.1px;color:var(--txt)}
+.card h2:before{content:"";width:8px;height:8px;border-radius:3px;background:linear-gradient(135deg,var(--gold2),var(--gold3));box-shadow:0 0 12px rgba(226,191,90,.6);flex:none}
+
+/* posicao aberta */
+.pos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.pos>div{padding:12px 14px;border-radius:var(--r2);background:rgba(255,255,255,.04);border:1px solid var(--edge2)}
+.pos>div:first-child{background:linear-gradient(140deg,rgba(226,191,90,.14),rgba(255,255,255,.03));border-color:rgba(226,191,90,.25)}
+.pos .k{color:var(--mut);font-size:11.5px;font-weight:600}
+.pos .v{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;margin-top:2px}
+.pnl{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.6px;line-height:1.15;margin-top:2px}
+@media (max-width:600px){.pos{grid-template-columns:1fr 1fr}.pos>div:first-child{grid-column:1/-1}.pnl{font-size:38px}}
+.bar{position:relative;height:10px;border-radius:999px;background:linear-gradient(90deg,rgba(255,107,122,.85),rgba(255,255,255,.14) 50%,rgba(62,224,163,.85));margin:20px 4px 6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}
+.bar i{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6d6,var(--gold) 60%,var(--gold3));transform:translate(-10px,-50%);box-shadow:0 0 0 4px rgba(226,191,90,.18),0 4px 12px rgba(0,0,0,.5)}
+.barl{display:flex;justify-content:space-between;gap:8px;color:var(--mut);font-size:12px;font-weight:600;margin-top:8px}
+.none{color:var(--mut);padding:6px 2px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.a{background:rgba(62,224,163,.14);color:var(--up);border:1px solid rgba(62,224,163,.25)}
+.pill.s{background:rgba(255,107,122,.14);color:var(--dn);border:1px solid rgba(255,107,122,.25)}
+.pill.o{background:rgba(226,191,90,.14);color:var(--gold2);border:1px solid rgba(226,191,90,.25)}
+
+/* grafico */
+.chartc .ch{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 12px;margin-bottom:6px}
+.chartc .ch h2{margin:0}
+.leg{color:var(--mut);font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.chartbox{margin:8px -8px 0;border-radius:var(--r2);overflow:hidden;background:rgba(0,0,0,.18);border:1px solid var(--edge2)}
+#chart{height:420px;width:100%}
+@media (max-width:600px){#chart{height:320px}.card{padding:16px}.chartbox{margin:8px -4px 0}}
+
+/* curva */
+#curva{width:100%;height:240px;display:block}
+@media (max-width:600px){#curva{height:190px}}
+
+/* tabela */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -6px;padding:0 6px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(255,255,255,.03)}
+th{color:var(--mut2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.8px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.n:last-child{font-weight:700}
+
+footer{color:var(--mut2);font-size:11.5px;line-height:1.55;margin-top:20px;padding:0 4px;text-align:center}
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"><b></b><b></b><b></b></div>
+<div class="wrap">
+  <header>
+    <div class="logo"><svg viewBox="0 0 32 32" width="54" height="54"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1bf"/><stop offset=".5" stop-color="#e2bf5a"/><stop offset="1" stop-color="#b98d26"/></linearGradient></defs><rect x=".5" y=".5" width="31" height="31" rx="9" fill="rgba(255,255,255,.06)" stroke="#e2bf5a" stroke-opacity=".45"/><path d="M6 23h20l-3.5-9h-13z" fill="url(#lg)"/><path d="M11 13h10l-2-5h-6z" fill="#f6dc8c"/></svg><span>Bullion</span></div>
+    <section class="hero glass">
+      <div class="hl">
+        <p class="tag">Robô de trading no ouro · resultados reais ao vivo</p>
+        <span class="badge">Robô FIMATHE · XAUUSD · <span id="conta">—</span> · <span id="ver">—</span></span>
+      </div>
+      <div class="quote">
+        <div class="px" id="px">—</div>
+        <div id="pxchg" class="k">—</div>
+      </div>
+    </section>
+    <div class="live"><span class="dot off" id="dot"></span><span id="upd">carregando…</span></div>
+  </header>
+
+  <div class="ticker glass"><div class="track" id="tick"></div></div>
+
+  <div class="card glass"><h2>Operação aberta agora</h2><div id="abertas" class="none">—</div></div>
+
+  <div class="card glass chartc">
+    <div class="ch"><h2>Gráfico do ouro · 15 minutos</h2>
+      <div class="leg"><span><i style="background:#e2bf5a"></i>Canal de abertura do dia</span><span><i style="background:#3ee0a3"></i>Alvo</span><span><i style="background:#ff6b7a"></i>Stop</span></div></div>
+    <div class="chartbox"><div id="chart"></div></div>
+  </div>
+
+  <div class="card glass"><h2>Curva do saldo</h2><svg id="curva" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg></div>
+
+  <div class="card glass"><h2>Histórico de operações</h2><div class="tw"><table>
+    <thead><tr><th>Entrada</th><th>Saída</th><th>Lado</th><th>Canal</th><th class="n">Preço entrada</th><th class="n">Preço saída</th><th>Resultado</th><th class="n">Lucro</th></tr></thead>
+    <tbody id="ops"></tbody></table></div></div>
+
+  <footer>Dados lidos da conta MetaTrader 5 a cada minuto, com até ~2–3 min de atraso. Horários no fuso do seu aparelho. Resultados passados não garantem resultados futuros. Não é recomendação de investimento.</footer>
+</div>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+// grafico M15: horarios em UTC no feed -> desloca para o fuso do aparelho
+const TZ = -new Date().getTimezoneOffset() * 60;
+const C = {up: "#3ee0a3", dn: "#ff6b7a", gold: "#e2bf5a", gold2: "#f6dc8c"};
+let chart = null, series = null, plines = [];
+function initChart() {
+  if (chart || !window.LightweightCharts) return;
+  const el = document.getElementById("chart");
+  chart = LightweightCharts.createChart(el, {
+    width: el.clientWidth || 800, height: el.clientHeight || 420,
+    layout: {background: {color: "transparent"}, textColor: "rgba(214,232,223,.62)", fontFamily: "Manrope", fontSize: 11},
+    grid: {vertLines: {color: "rgba(255,255,255,.045)"}, horzLines: {color: "rgba(255,255,255,.045)"}},
+    rightPriceScale: {borderColor: "rgba(255,255,255,.10)"},
+    timeScale: {borderColor: "rgba(255,255,255,.10)", timeVisible: true, secondsVisible: false, rightOffset: 4, barSpacing: innerWidth < 600 ? 6 : 9},
+    crosshair: {mode: 0, vertLine: {color: "rgba(246,220,140,.35)", labelBackgroundColor: "#7a5f1c"}, horzLine: {color: "rgba(246,220,140,.35)", labelBackgroundColor: "#7a5f1c"}},
+    localization: {locale: "pt-BR"},
+  });
+  addEventListener("resize", () => chart.resize(el.clientWidth, el.clientHeight));
+  series = chart.addCandlestickSeries({upColor: C.up, downColor: C.dn, borderVisible: false,
+    wickUpColor: C.up, wickDownColor: C.dn});
+}
+function drawChart(d) {
+  initChart();
+  if (!series || !d.m15 || !d.m15.length) return;
+  series.setData(d.m15.map(c => ({time: c[0] + TZ, open: c[1], high: c[2], low: c[3], close: c[4]})));
+  plines.forEach(l => series.removePriceLine(l)); plines = [];
+  const add = (price, color, title, style) => plines.push(series.createPriceLine({price, color, title, lineWidth: 1, lineStyle: style, axisLabelVisible: true}));
+  if (d.ca) { add(d.ca.topo, C.gold, "Topo do canal", 0); add(d.ca.fundo, C.gold, "Fundo do canal", 0); }
+  (d.abertas || []).forEach(p => {
+    add(p.preco_entrada, C.gold2, p.lado + " " + p.preco_entrada, 2);
+    add(p.tp, C.up, "Alvo", 2); add(p.sl, C.dn, "Stop", 2);
+  });
+  const t0 = d.m15[0][0], q = s => Math.floor((Date.parse(s) / 1000) / 900) * 900 + TZ;
+  const mk = [];
+  (d.operacoes || []).filter(o => Date.parse(o.saida) / 1000 >= t0).forEach(o => {
+    const buy = o.lado === "Compra";
+    if (Date.parse(o.entrada) / 1000 >= t0) mk.push({time: q(o.entrada), position: buy ? "belowBar" : "aboveBar", color: buy ? C.up : C.dn, shape: buy ? "arrowUp" : "arrowDown", text: o.lado});
+    mk.push({time: q(o.saida), position: "aboveBar", color: o.lucro >= 0 ? C.up : C.dn, shape: "circle", text: (o.lucro >= 0 ? "+" : "") + o.lucro.toFixed(0)});
+  });
+  (d.abertas || []).forEach(p => { const buy = p.lado === "Compra";
+    mk.push({time: q(p.entrada), position: buy ? "belowBar" : "aboveBar", color: C.gold2, shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
+  series.setMarkers(mk.sort((a, b) => a.time - b.time));
+}
+const GIST = "71311f75b9108ad18027bebe14ecc19c";
+const $ = id => document.getElementById(id);
+const usd = v => (v < 0 ? "-" : "") + "$" + Math.abs(v).toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const sgn = v => (v > 0 ? "+" : "") + usd(v);
+const cls = v => v > 0 ? "up" : v < 0 ? "dn" : "";
+const dt = s => new Date(s).toLocaleString("pt-BR", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
+let data = null;
+
+async function load() {
+  // raw do gist (sem limite de 60/h da API); o ?t= evita o cache
+  try {
+    const r = await fetch("https://gist.githubusercontent.com/nyx0731/" + GIST + "/raw/live.json?t=" + Date.now(), {cache: "no-store"});
+    if (r.ok) data = JSON.parse(await r.text());
+  } catch (e) { console.warn(e); }
+  if (data && data.saldo !== undefined) render(data);
+  tick();
+}
+function tick() {
+  if (!data || !data.enviado) return;
+  const age = (Date.now() - new Date(data.enviado)) / 1000;
+  const on = age < 600;
+  $("dot").className = "dot" + (on ? "" : " off");
+  $("upd").textContent = (on ? "Ao vivo · " : "Sem atualização recente · ") + "atualizado " +
+    (age < 90 ? "há " + Math.max(1, Math.round(age)) + " s" : "às " + dt(data.enviado));
+}
+
+function render(d) {
+  const ops = d.operacoes || [], wins = ops.filter(o => o.lucro > 0).length;
+  const lucro = d.saldo - d.base;
+  $("conta").textContent = "Conta " + d.conta; $("ver").textContent = d.versao;
+  $("px").textContent = "$" + d.preco.bid.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+  if (d.ca) { const ch = d.preco.bid - d.ca.abertura;
+    $("pxchg").innerHTML = `<span class="${cls(ch)}">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(2)} (${(100 * ch / d.ca.abertura).toFixed(2)}%)</span> no dia`; }
+  drawChart(d);
+  const pz = d.patrimonio - d.saldo, items = [
+    ["gold", "Lucro desde " + d.inicio.split("-").reverse().slice(0, 2).join("/"), sgn(lucro)],
+    ["gold", "Crescimento da conta", (lucro >= 0 ? "+" : "") + (100 * lucro / d.base).toFixed(1) + "%"],
+    ["", "Saldo", usd(d.saldo)],
+    ["", "Patrimônio ao vivo", usd(d.patrimonio) + (pz ? ` <small class="${cls(pz)}">(${sgn(pz)})</small>` : "")],
+    ["", "Acerto", ops.length ? Math.round(100 * wins / ops.length) + "%" : "—"],
+    ["", "Operações", ops.length + (d.abertas.length ? " + " + d.abertas.length + " aberta" : "")],
+    ["", "Ouro", "$" + d.preco.bid.toLocaleString("pt-BR", {minimumFractionDigits: 2})],
+  ].map(([c, k, v]) => `<span class="ti ${c}"><span class="k">${k}</span><span class="v">${v}</span></span>`).join("");
+  $("tick").innerHTML = items + items;
+  $("abertas").className = d.abertas.length ? "" : "none";
+  $("abertas").innerHTML = d.abertas.length ? d.abertas.map(p => {
+    const pct = Math.min(100, Math.max(0, 100 * (p.preco_atual - p.sl) / (p.tp - p.sl)));
+    const left = "Stop " + p.sl, right = "Alvo " + p.tp, flip = "";
+    return `<div class="pos">
+      <div><div class="k">Resultado agora</div><div class="pnl ${cls(p.lucro)}">${sgn(p.lucro)}</div></div>
+      <div><div class="k">Lado</div><div class="v"><span class="pill ${p.lado === "Compra" ? "a" : "s"}">${p.lado}</span> ${p.lote} lote</div></div>
+      <div><div class="k">Entrada</div><div class="v">${p.preco_entrada}</div><div class="k">${dt(p.entrada)}</div></div>
+      <div><div class="k">Preço atual</div><div class="v">${p.preco_atual}</div></div>
+      <div><div class="k">Stop</div><div class="v dn">${p.sl}</div></div>
+      <div><div class="k">Alvo</div><div class="v up">${p.tp}</div></div></div>
+      <div class="bar" style="${flip}"><i style="left:${pct}%"></i></div>
+      <div class="barl"><span>${left}</span><span>${p.canal}</span><span>${right}</span></div>`;
+  }).join("") : "Nenhuma operação aberta. O robô está esperando o próximo sinal.";
+
+  $("ops").innerHTML = ops.slice().reverse().map(o => `<tr><td>${dt(o.entrada)}</td><td>${dt(o.saida)}</td>
+    <td>${o.lado}</td><td>${o.canal}</td><td class="n">${o.preco_entrada}</td><td class="n">${o.preco_saida}</td>
+    <td><span class="pill ${o.resultado === "Alvo" ? "a" : o.resultado === "Stop" ? "s" : "o"}">${o.resultado}</span></td>
+    <td class="n ${cls(o.lucro)}">${sgn(o.lucro)}</td></tr>`).join("");
+
+  // curva do saldo: base + soma dos lucros; ultimo ponto = patrimonio ao vivo
+  let s = d.base; const pts = [s]; ops.forEach(o => pts.push(s += o.lucro));
+  if (d.abertas.length) pts.push(d.patrimonio);
+  const mn = Math.min(...pts), mx = Math.max(...pts), pad = (mx - mn) * 0.12 || 10;
+  const X = i => 10 + 980 * i / Math.max(1, pts.length - 1), Y = v => 225 - 210 * (v - mn + pad) / (mx - mn + 2 * pad);
+  const path = pts.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join("");
+  $("curva").innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2bf5a" stop-opacity=".38"/><stop offset="1" stop-color="#e2bf5a" stop-opacity="0"/></linearGradient>
+    <linearGradient id="gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b98d26"/><stop offset=".6" stop-color="#e2bf5a"/><stop offset="1" stop-color="#fff1bf"/></linearGradient></defs>
+    <line x1="0" x2="1000" y1="${Y(d.base)}" y2="${Y(d.base)}" stroke="rgba(255,255,255,.18)" stroke-dasharray="6 6" vector-effect="non-scaling-stroke"/>
+    <path d="${path}L${X(pts.length - 1)} 240L${X(0)} 240Z" fill="url(#g)"/>
+    <path d="${path}" fill="none" stroke="url(#gl)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    ${pts.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="4" fill="${v >= pts[i] ? C.up : C.dn}" stroke="rgba(2,8,6,.6)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`).join("")}`;
+}
+
+// faixa corrida: anda sozinha e pode ser arrastada para os dois lados (mouse ou dedo)
+const tk = {x: 0, drag: false, lx: 0, lt: 0, v: 0, last: 0};
+function tickerLoop(ts) {
+  const dt = tk.last ? Math.min(50, ts - tk.last) : 16; tk.last = ts;
+  const tr = $("tick"), half = tr.scrollWidth / 2;
+  if (!tk.drag) {
+    if (Math.abs(tk.v) > 0.06) { tk.x += tk.v * dt; tk.v *= Math.pow(0.94, dt / 16); }
+    else { tk.v = 0; tk.x -= 0.05 * dt; }
+  }
+  if (half > 0) { tk.x %= half; if (tk.x > 0) tk.x -= half; }
+  tr.style.transform = `translate3d(${tk.x}px,0,0)`;
+  requestAnimationFrame(tickerLoop);
+}
+(() => {
+  const el = document.querySelector(".ticker");
+  el.addEventListener("pointerdown", e => { tk.drag = true; tk.lx = e.clientX; tk.lt = performance.now(); tk.v = 0; el.classList.add("drag"); el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => { if (!tk.drag) return; const now = performance.now(), dx = e.clientX - tk.lx;
+    tk.x += dx; tk.v = dx / Math.max(8, now - tk.lt); tk.lx = e.clientX; tk.lt = now; });
+  const up = () => { tk.drag = false; el.classList.remove("drag"); };
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  requestAnimationFrame(tickerLoop);
+})();
+
+load(); setInterval(load, 45000); setInterval(tick, 5000);
+</script>
+</body>
+</html>

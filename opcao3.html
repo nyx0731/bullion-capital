@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bullion</title>
+<meta name="description" content="Resultados ao vivo do robô FIMATHE no ouro (XAUUSD M5).">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2308090b'/%3E%3Cpath d='M6 23h20l-3.5-9h-13z' fill='%23ffb000'/%3E%3Cpath d='M11 13h10l-2-5h-6z' fill='%23ffd27a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090b;--panel:#0e0f12;--panel2:#13151a;--line:#22252b;--line2:#30343c;
+  --txt:#e7e4dc;--mut:#7f838c;--mut2:#5c6068;
+  --amb:#ffb000;--amb2:#ffd27a;--up:#22d38a;--dn:#ff4f5e;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background-color:var(--bg);background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);background-size:18px 18px;color:var(--txt);font:14px/1.45 var(--sans);overflow-x:hidden}
+.wrap{max-width:1120px;margin:0 auto;padding:14px 16px 40px}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.dn{color:var(--dn)}
+
+/* ---------- header ---------- */
+header{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"logo live" "hero hero";align-items:center;gap:10px 12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.logo{grid-area:logo;display:flex;align-items:center;gap:10px;font:600 22px/1 var(--sans);letter-spacing:.2px;color:var(--txt)}
+.logo svg{flex:none;display:block}
+.logo span{position:relative}
+.logo span::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:2px;background:var(--amb)}
+.live{grid-area:live;justify-self:end;display:inline-flex;align-items:center;gap:7px;font:500 11px/1.3 var(--mono);color:var(--mut);text-align:right;text-transform:uppercase;letter-spacing:.4px;min-width:0}
+.dot{flex:none;width:8px;height:8px;background:var(--up);box-shadow:0 0 0 0 rgba(34,211,138,.6);animation:p 1.6s infinite}
+.dot.off{background:#5a5d63;animation:none;box-shadow:none}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(34,211,138,.55)}70%{box-shadow:0 0 0 7px rgba(34,211,138,0)}100%{box-shadow:0 0 0 0 rgba(34,211,138,0)}}
+.hero{grid-area:hero;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 10px;border:1px solid var(--line);border-left:2px solid var(--amb);background:var(--panel);min-width:0}
+.hl{min-width:0}
+.hero .tag{margin:0;font-size:12px;line-height:1.3;color:var(--txt)}
+.hero .badge{display:block;margin-top:2px;font:500 10px/1.3 var(--mono);color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.quote{text-align:right;flex:none}
+.quote .sym{font:600 9px/1 var(--mono);color:var(--amb);letter-spacing:1px}
+.quote .px{font:700 17px/1.15 var(--mono);font-variant-numeric:tabular-nums;color:var(--txt)}
+.quote .k{font:500 10px/1.2 var(--mono);color:var(--mut)}
+@media (min-width:900px){
+  header{grid-template-columns:auto minmax(0,620px) auto;grid-template-areas:"logo hero live";justify-content:space-between;gap:20px}
+  .logo{font-size:26px}
+}
+
+/* ---------- ticker ---------- */
+.ticker{margin:12px 0 0;border:1px solid var(--line);background:var(--panel);overflow:hidden;white-space:nowrap;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.ticker.drag{cursor:grabbing}
+.track{display:inline-flex;will-change:transform}
+.ti{display:inline-flex;align-items:baseline;gap:8px;padding:9px 18px;border-right:1px solid var(--line)}
+.ti .k{color:var(--mut);font:500 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.8px}
+.ti .v{font:600 15px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--txt)}
+.ti .v small{font-size:11px;font-weight:500}
+.ti.gold .v{color:var(--amb)}
+
+/* ---------- panels ---------- */
+.card{background:var(--panel);border:1px solid var(--line);margin-top:12px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.ph h2{margin:0;font:600 11px/1.3 var(--mono);color:var(--amb);text-transform:uppercase;letter-spacing:1.2px;display:flex;align-items:center;gap:8px}
+.ph h2::before{content:"";width:6px;height:6px;background:var(--amb);flex:none}
+.ph .meta{font:500 10px/1 var(--mono);color:var(--mut2);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.pb{padding:12px}
+
+/* posição aberta */
+.none{color:var(--mut);font:13px/1.5 var(--mono)}
+.none::before{content:"> ";color:var(--amb)}
+.pos{display:grid;grid-template-columns:1fr;gap:10px}
+.pl .k,.c .k{color:var(--mut);font:500 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.8px}
+.pnl{font:700 34px/1.1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.5px;margin-top:2px}
+.cells{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.c{background:var(--panel);padding:8px 10px;min-width:0}
+.c.wide{grid-column:1/-1}
+.c .v{font:600 15px/1.35 var(--mono);font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.c .t{margin-top:2px;text-transform:none;letter-spacing:0;color:var(--mut2)}
+@media (min-width:760px){
+  .pos{grid-template-columns:220px 1fr;align-items:stretch}
+  .pl{display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line);padding:8px 12px;background:var(--panel2)}
+  .cells{grid-template-columns:repeat(5,1fr)}
+  .c.wide{grid-column:auto}
+}
+.pill{display:inline-block;padding:1px 7px;font:600 11px/1.5 var(--mono);text-transform:uppercase;letter-spacing:.5px;border:1px solid currentColor}
+.pill.a{color:var(--up);background:rgba(34,211,138,.08)}
+.pill.s{color:var(--dn);background:rgba(255,79,94,.08)}
+.pill.o{color:var(--amb2);background:rgba(255,176,0,.08)}
+.bar{position:relative;height:6px;background:linear-gradient(90deg,var(--dn),#2a2c31 50%,var(--up));margin:16px 0 6px}
+.bar i{position:absolute;top:-6px;width:3px;height:18px;background:var(--amb);transform:translateX(-1.5px);box-shadow:0 0 8px rgba(255,176,0,.6)}
+.barl{display:flex;justify-content:space-between;gap:8px;color:var(--mut);font:500 11px/1.3 var(--mono)}
+.barl span:nth-child(2){color:var(--amb2);text-align:center}
+.barl span:last-child{text-align:right}
+
+/* gráfico */
+.leg{display:flex;flex-wrap:wrap;gap:4px 14px;padding:8px 12px 0;color:var(--mut);font:500 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.6px}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{display:inline-block;width:14px;height:2px}
+.leg i.d{background:none!important;border-top:2px dashed}
+#chart{height:420px;margin:6px 4px 4px;overflow:hidden}
+@media (max-width:600px){#chart{height:300px}}
+
+/* curva */
+#curva{width:100%;height:220px;display:block}
+@media (max-width:600px){#curva{height:170px}}
+.cmeta{display:flex;justify-content:space-between;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font:500 11px/1.3 var(--mono);color:var(--mut)}
+.cmeta b{display:block;font-weight:600;font-size:13px;color:var(--txt)}
+.cmeta div:nth-child(2){text-align:center}.cmeta div:last-child{text-align:right}
+
+/* tabela */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font:12px/1.4 var(--mono);font-variant-numeric:tabular-nums;min-width:640px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mut);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.8px;background:var(--panel2)}
+tbody tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+tbody tr:hover td{background:rgba(255,176,0,.05)}
+td.n,th.n{text-align:right}
+td.n.up,td.n.dn{font-weight:600}
+
+footer{margin-top:16px;padding-top:10px;border-top:1px solid var(--line);color:var(--mut2);font:11px/1.5 var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="3" fill="#0e0f12" stroke="#ffb000" stroke-opacity=".55"/><path d="M6 23h20l-3.5-9h-13z" fill="#ffb000"/><path d="M11 13h10l-2-5h-6z" fill="#ffd27a"/></svg><span>Bullion</span></div>
+    <section class="hero">
+      <div class="hl">
+        <p class="tag">Robô de trading no ouro · resultados reais ao vivo</p>
+        <span class="badge">Robô FIMATHE · XAUUSD · <span id="conta">—</span> · <span id="ver">—</span></span>
+      </div>
+      <div class="quote">
+        <div class="sym">XAUUSD</div>
+        <div class="px" id="px">—</div>
+        <div id="pxchg" class="k">—</div>
+      </div>
+    </section>
+    <div class="live"><span class="dot off" id="dot"></span><span id="upd">carregando…</span></div>
+  </header>
+
+  <div class="ticker"><div class="track" id="tick"></div></div>
+
+  <div class="card">
+    <div class="ph"><h2>Operação aberta agora</h2><span class="meta">Posição</span></div>
+    <div class="pb"><div id="abertas" class="none">—</div></div>
+  </div>
+
+  <div class="card chartc">
+    <div class="ph"><h2>Gráfico do ouro · 15 minutos</h2><span class="meta">XAUUSD · M15</span></div>
+    <div class="leg"><span><i style="background:#ffb000"></i>Canal de abertura do dia</span><span><i class="d" style="color:#ffd27a"></i>Entrada</span><span><i class="d" style="color:#22d38a"></i>Alvo</span><span><i class="d" style="color:#ff4f5e"></i>Stop</span></div>
+    <div id="chart"></div>
+  </div>
+
+  <div class="card">
+    <div class="ph"><h2>Curva do saldo</h2><span class="meta">USD</span></div>
+    <div class="pb">
+      <svg id="curva" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg>
+      <div class="cmeta" id="cmeta"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ph"><h2>Histórico de operações</h2><span class="meta" id="nops">—</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Entrada</th><th>Saída</th><th>Lado</th><th>Canal</th><th class="n">Preço entrada</th><th class="n">Preço saída</th><th>Resultado</th><th class="n">Lucro</th></tr></thead>
+      <tbody id="ops"></tbody></table></div>
+  </div>
+
+  <footer>Dados lidos da conta MetaTrader 5 a cada minuto, com até ~2–3 min de atraso. Horários no fuso do seu aparelho. Resultados passados não garantem resultados futuros. Não é recomendação de investimento.</footer>
+</div>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+// cores do tema (grafico e curva)
+const C = {amb: "#ffb000", amb2: "#ffd27a", up: "#22d38a", dn: "#ff4f5e", mut: "#7f838c", line: "#22252b", grid: "rgba(255,255,255,.045)"};
+// grafico M15: horarios em UTC no feed -> desloca para o fuso do aparelho
+const TZ = -new Date().getTimezoneOffset() * 60;
+let chart = null, series = null, plines = [];
+function initChart() {
+  if (chart || !window.LightweightCharts) return;
+  const el = document.getElementById("chart");
+  chart = LightweightCharts.createChart(el, {
+    width: el.clientWidth || 800, height: el.clientHeight || 420,
+    layout: {background: {color: "transparent"}, textColor: C.mut, fontFamily: "IBM Plex Mono, monospace", fontSize: 11},
+    grid: {vertLines: {color: C.grid}, horzLines: {color: C.grid}},
+    rightPriceScale: {borderColor: C.line},
+    timeScale: {borderColor: C.line, timeVisible: true, secondsVisible: false, rightOffset: 4, barSpacing: innerWidth < 600 ? 6 : 9},
+    crosshair: {mode: 0, vertLine: {color: "rgba(255,176,0,.35)", labelBackgroundColor: "#2a2410"}, horzLine: {color: "rgba(255,176,0,.35)", labelBackgroundColor: "#2a2410"}},
+    localization: {locale: "pt-BR"},
+  });
+  addEventListener("resize", () => chart.resize(el.clientWidth, el.clientHeight));
+  series = chart.addCandlestickSeries({upColor: C.up, downColor: C.dn, borderVisible: false,
+    wickUpColor: C.up, wickDownColor: C.dn});
+}
+function drawChart(d) {
+  initChart();
+  if (!series || !d.m15 || !d.m15.length) return;
+  series.setData(d.m15.map(c => ({time: c[0] + TZ, open: c[1], high: c[2], low: c[3], close: c[4]})));
+  plines.forEach(l => series.removePriceLine(l)); plines = [];
+  const add = (price, color, title, style) => plines.push(series.createPriceLine({price, color, title, lineWidth: 1, lineStyle: style, axisLabelVisible: true}));
+  if (d.ca) { add(d.ca.topo, C.amb, "Topo do canal", 0); add(d.ca.fundo, C.amb, "Fundo do canal", 0); }
+  (d.abertas || []).forEach(p => {
+    add(p.preco_entrada, C.amb2, p.lado + " " + p.preco_entrada, 2);
+    add(p.tp, C.up, "Alvo", 2); add(p.sl, C.dn, "Stop", 2);
+  });
+  const t0 = d.m15[0][0], q = s => Math.floor((Date.parse(s) / 1000) / 900) * 900 + TZ;
+  const mk = [];
+  (d.operacoes || []).filter(o => Date.parse(o.saida) / 1000 >= t0).forEach(o => {
+    const buy = o.lado === "Compra";
+    if (Date.parse(o.entrada) / 1000 >= t0) mk.push({time: q(o.entrada), position: buy ? "belowBar" : "aboveBar", color: buy ? C.up : C.dn, shape: buy ? "arrowUp" : "arrowDown", text: o.lado});
+    mk.push({time: q(o.saida), position: "aboveBar", color: o.lucro >= 0 ? C.up : C.dn, shape: "circle", text: (o.lucro >= 0 ? "+" : "") + o.lucro.toFixed(0)});
+  });
+  (d.abertas || []).forEach(p => { const buy = p.lado === "Compra";
+    mk.push({time: q(p.entrada), position: buy ? "belowBar" : "aboveBar", color: C.amb2, shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
+  series.setMarkers(mk.sort((a, b) => a.time - b.time));
+}
+const GIST = "71311f75b9108ad18027bebe14ecc19c";
+const $ = id => document.getElementById(id);
+const usd = v => (v < 0 ? "-" : "") + "$" + Math.abs(v).toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const sgn = v => (v > 0 ? "+" : "") + usd(v);
+const cls = v => v > 0 ? "up" : v < 0 ? "dn" : "";
+const dt = s => new Date(s).toLocaleString("pt-BR", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
+let data = null;
+
+async function load() {
+  // raw do gist (sem limite de 60/h da API); o ?t= evita o cache
+  try {
+    const r = await fetch("https://gist.githubusercontent.com/nyx0731/" + GIST + "/raw/live.json?t=" + Date.now(), {cache: "no-store"});
+    if (r.ok) data = JSON.parse(await r.text());
+  } catch (e) { console.warn(e); }
+  if (data && data.saldo !== undefined) render(data);
+  tick();
+}
+function tick() {
+  if (!data || !data.enviado) return;
+  const age = (Date.now() - new Date(data.enviado)) / 1000;
+  const on = age < 600;
+  $("dot").className = "dot" + (on ? "" : " off");
+  $("upd").textContent = (on ? "Ao vivo · " : "Sem atualização recente · ") + "atualizado " +
+    (age < 90 ? "há " + Math.max(1, Math.round(age)) + " s" : "às " + dt(data.enviado));
+}
+
+function render(d) {
+  const ops = d.operacoes || [], wins = ops.filter(o => o.lucro > 0).length;
+  const lucro = d.saldo - d.base;
+  $("conta").textContent = "Conta " + d.conta; $("ver").textContent = d.versao;
+  $("px").textContent = "$" + d.preco.bid.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+  if (d.ca) { const ch = d.preco.bid - d.ca.abertura;
+    $("pxchg").innerHTML = `<span class="${cls(ch)}">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(2)} (${(100 * ch / d.ca.abertura).toFixed(2)}%)</span> no dia`; }
+  drawChart(d);
+  const pz = d.patrimonio - d.saldo, items = [
+    ["gold", "Lucro desde " + d.inicio.split("-").reverse().slice(0, 2).join("/"), sgn(lucro)],
+    ["gold", "Crescimento da conta", (lucro >= 0 ? "+" : "") + (100 * lucro / d.base).toFixed(1) + "%"],
+    ["", "Saldo", usd(d.saldo)],
+    ["", "Patrimônio ao vivo", usd(d.patrimonio) + (pz ? ` <small class="${cls(pz)}">(${sgn(pz)})</small>` : "")],
+    ["", "Acerto", ops.length ? Math.round(100 * wins / ops.length) + "%" : "—"],
+    ["", "Operações", ops.length + (d.abertas.length ? " + " + d.abertas.length + " aberta" : "")],
+    ["", "Ouro", "$" + d.preco.bid.toLocaleString("pt-BR", {minimumFractionDigits: 2})],
+  ].map(([c, k, v]) => `<span class="ti ${c}"><span class="k">${k}</span><span class="v">${v}</span></span>`).join("");
+  $("tick").innerHTML = items + items;
+  $("abertas").className = d.abertas.length ? "" : "none";
+  $("abertas").innerHTML = d.abertas.length ? d.abertas.map(p => {
+    const pct = Math.min(100, Math.max(0, 100 * (p.preco_atual - p.sl) / (p.tp - p.sl)));
+    const left = "Stop " + p.sl, right = "Alvo " + p.tp;
+    return `<div class="pos">
+      <div class="pl"><div class="k">Resultado agora</div><div class="pnl ${cls(p.lucro)}">${sgn(p.lucro)}</div></div>
+      <div class="cells">
+        <div class="c wide"><div class="k">Lado</div><div class="v"><span class="pill ${p.lado === "Compra" ? "a" : "s"}">${p.lado}</span> ${p.lote} lote</div></div>
+        <div class="c"><div class="k">Entrada</div><div class="v">${p.preco_entrada}</div><div class="k t">${dt(p.entrada)}</div></div>
+        <div class="c"><div class="k">Preço atual</div><div class="v">${p.preco_atual}</div></div>
+        <div class="c"><div class="k">Stop</div><div class="v dn">${p.sl}</div></div>
+        <div class="c"><div class="k">Alvo</div><div class="v up">${p.tp}</div></div>
+      </div></div>
+      <div class="bar"><i style="left:${pct}%"></i></div>
+      <div class="barl"><span>${left}</span><span>${p.canal}</span><span>${right}</span></div>`;
+  }).join("") : "Nenhuma operação aberta. O robô está esperando o próximo sinal.";
+
+  $("nops").textContent = ops.length + (ops.length === 1 ? " operação" : " operações");
+  $("ops").innerHTML = ops.slice().reverse().map(o => `<tr><td>${dt(o.entrada)}</td><td>${dt(o.saida)}</td>
+    <td>${o.lado}</td><td>${o.canal}</td><td class="n">${o.preco_entrada}</td><td class="n">${o.preco_saida}</td>
+    <td><span class="pill ${o.resultado === "Alvo" ? "a" : o.resultado === "Stop" ? "s" : "o"}">${o.resultado}</span></td>
+    <td class="n ${cls(o.lucro)}">${sgn(o.lucro)}</td></tr>`).join("");
+
+  // curva do saldo: base + soma dos lucros; ultimo ponto = patrimonio ao vivo
+  let s = d.base; const pts = [s]; ops.forEach(o => pts.push(s += o.lucro));
+  if (d.abertas.length) pts.push(d.patrimonio);
+  const mn = Math.min(...pts), mx = Math.max(...pts), pad = (mx - mn) * 0.12 || 10;
+  const X = i => 10 + 980 * i / Math.max(1, pts.length - 1), Y = v => 225 - 210 * (v - mn + pad) / (mx - mn + 2 * pad);
+  const path = pts.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join("");
+  const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="1000" y1="${240 * f}" y2="${240 * f}" stroke="${C.grid}" vector-effect="non-scaling-stroke"/>`).join("");
+  // pontos com traço de comprimento zero + ponta redonda: ficam redondos mesmo com preserveAspectRatio="none"
+  $("curva").innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.amb}" stop-opacity=".28"/><stop offset="1" stop-color="${C.amb}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <line x1="0" x2="1000" y1="${Y(d.base)}" y2="${Y(d.base)}" stroke="${C.mut}" stroke-opacity=".6" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>
+    <path d="${path}L${X(pts.length - 1)} 240L${X(0)} 240Z" fill="url(#g)"/>
+    <path d="${path}" fill="none" stroke="${C.amb}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    ${pts.slice(1).map((v, i) => `<path d="M${X(i + 1).toFixed(1)} ${Y(v).toFixed(1)}h0" stroke="${v >= pts[i] ? C.up : C.dn}" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join("")}`;
+  const last = pts[pts.length - 1];
+  $("cmeta").innerHTML = `<div>Base<b>${usd(d.base)}</b></div><div>Máx.<b>${usd(mx)}</b></div><div>${d.abertas.length ? "Agora (ao vivo)" : "Atual"}<b class="${cls(last - d.base)}">${usd(last)}</b></div>`;
+}
+
+// faixa corrida: anda sozinha e pode ser arrastada para os dois lados (mouse ou dedo)
+const tk = {x: 0, drag: false, lx: 0, lt: 0, v: 0, last: 0};
+function tickerLoop(ts) {
+  const dt = tk.last ? Math.min(50, ts - tk.last) : 16; tk.last = ts;
+  const tr = $("tick"), half = tr.scrollWidth / 2;
+  if (!tk.drag) {
+    if (Math.abs(tk.v) > 0.06) { tk.x += tk.v * dt; tk.v *= Math.pow(0.94, dt / 16); }
+    else { tk.v = 0; tk.x -= 0.05 * dt; }
+  }
+  if (half > 0) { tk.x %= half; if (tk.x > 0) tk.x -= half; }
+  tr.style.transform = `translate3d(${tk.x}px,0,0)`;
+  requestAnimationFrame(tickerLoop);
+}
+(() => {
+  const el = document.querySelector(".ticker");
+  el.addEventListener("pointerdown", e => { tk.drag = true; tk.lx = e.clientX; tk.lt = performance.now(); tk.v = 0; el.classList.add("drag"); el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => { if (!tk.drag) return; const now = performance.now(), dx = e.clientX - tk.lx;
+    tk.x += dx; tk.v = dx / Math.max(8, now - tk.lt); tk.lx = e.clientX; tk.lt = now; });
+  const up = () => { tk.drag = false; el.classList.remove("drag"); };
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  requestAnimationFrame(tickerLoop);
+})();
+
+load(); setInterval(load, 45000); setInterval(tick, 5000);
+</script>
+</body>
+</html>
