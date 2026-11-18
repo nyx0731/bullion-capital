@@ -92,27 +92,83 @@ header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1
 #chart{height:420px;width:100%}
 @media (max-width:600px){#chart{height:320px}.card{padding:14px}}
 
-/* curve */
-#curva{width:100%;height:220px;display:block}
-.curvebox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px;overflow:hidden}
+/* ===== curva do saldo ===== */
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--bg2);border:1px solid var(--line);border-radius:11px}
+.seg button{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--mut);font:700 12px/1 "Plus Jakarta Sans",system-ui,sans-serif;padding:7px 12px;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .15s,background .15s}
+.seg button:hover{color:var(--txt)}
+.seg button.on{background:var(--card2);color:var(--acc);box-shadow:inset 0 0 0 1px var(--line2)}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.kpis:empty{display:none}
+.kpi{background:var(--bg2);padding:11px 14px;min-width:0}
+.kpi .k{color:var(--mut);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font:700 17px/1.3 "JetBrains Mono",monospace;font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v .sl{color:var(--mut2);margin:0 3px;font-weight:500}
+.kpi .s{color:var(--mut2);font-size:11px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s b{font-weight:700}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:10px 12px}.kpi .v{font-size:15.5px}.seg button{padding:7px 10px}}
+.curvebox{position:relative;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px 2px 2px 4px;overflow:hidden}
+#curva{width:100%;height:300px}
+@media (max-width:600px){#curva{height:230px}}
+.ctip{position:absolute;top:10px;left:0;z-index:3;pointer-events:none;min-width:168px;background:rgba(22,24,29,.97);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;box-shadow:0 10px 28px rgba(0,0,0,.4);font-size:11.5px;line-height:1.45;color:var(--mut);opacity:0;transition:opacity .12s}
+.ctip.on{opacity:1}
+.ctip .b{font:700 15px/1.3 "JetBrains Mono",monospace;font-variant-numeric:tabular-nums;color:var(--txt);margin:2px 0 3px}
+.ctip .r{display:flex;justify-content:space-between;gap:12px;white-space:nowrap}
+.ctip .r span:last-child{font-family:"JetBrains Mono",monospace;font-weight:700}
+.cleg{display:flex;justify-content:space-between;align-items:center;gap:6px 14px;flex-wrap:wrap;margin-top:10px;padding:0 2px;font-size:11.5px;color:var(--mut)}
+.cleg .l{display:flex;gap:12px;flex-wrap:wrap}
+.cleg i{display:inline-block;vertical-align:middle;margin:-2px 6px 0 0}
+.cleg .lgl{width:14px;height:3px;border-radius:2px;background:var(--acc)}
+.cleg .lgd{width:8px;height:8px;border-radius:50%;background:currentColor}
+.cleg b{font-family:"JetBrains Mono",monospace;font-weight:700}
 
-/* table */
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:640px}
-th,td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{color:var(--mut);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;background:var(--bg2)}
-th:first-child{border-radius:10px 0 0 10px}th:last-child{border-radius:0 10px 10px 0}
-th{border-bottom:0}
-td.n,th.n{text-align:right}
-td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
-td.n.up,td.n.dn{font-weight:700}
-tbody tr:hover td{background:rgba(255,255,255,.02)}
-tbody tr:last-child td{border-bottom:0}
+/* ===== historico ===== */
+.hday+.hday{margin-top:16px}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:0 4px 8px;font-size:12px}
+.dh b{color:var(--txt);font-weight:700;font-size:13px}
+.dh .c{color:var(--mut);font-weight:600;margin-left:8px}
+.dh .t{font:700 13.5px/1 "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.tlist{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:0 12px}
+.tc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0}
+.tc+.tc{border-top:1px solid var(--line)}
+.t1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tm{font-size:12.5px;color:var(--txt)}
+.du{font-size:11px;color:var(--mut2)}
+.cn{font-size:12.5px;color:var(--mut);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr{font-size:11.5px;color:var(--mut2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.pl{font:700 16px/1.2 "JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.hd{display:none}
+@media (min-width:1024px){.hm{display:none}.hd{display:block;overflow-x:auto}}
+.ht{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.ht th{position:sticky;top:0;z-index:2;background:var(--card2);color:var(--mut);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.ht th:first-child{border-top-left-radius:10px}.ht th:last-child{border-top-right-radius:10px}
+.ht td{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.ht .n{text-align:right}
+.ht td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.ht td.pl{font-size:13.5px}
+.ht td.cn2{max-width:260px;overflow:hidden;text-overflow:ellipsis;color:var(--mut)}
+.ht tr.z td{background:rgba(255,255,255,.018)}
+.ht tr.r:hover td{background:rgba(247,195,49,.05)}
+.ht tr.dr td{background:var(--bg2);padding:9px 12px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--line2)}
+.ht tr.dr td b{color:var(--txt);font-size:13px;margin-right:8px}
+.ht tr.dr td.n{font-size:13px;font-weight:700}
+.ht .du{margin-left:8px}
+.more{display:block;width:100%;margin-top:14px;padding:11px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font:700 13px/1.2 "Plus Jakarta Sans",system-ui,sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s}
+.more:hover{border-color:rgba(247,195,49,.5);color:var(--acc)}
+.more[hidden]{display:none}
 .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;line-height:1.4}
 .pill.a{background:var(--upbg);color:var(--up)}.pill.s{background:var(--dnbg);color:var(--dn)}.pill.o{background:var(--accbg);color:var(--acc)}
 .pill.n{background:var(--card2);color:var(--txt);border:1px solid var(--line2)}
 
-footer{color:var(--mut2);font-size:11.5px;line-height:1.55;margin-top:20px;padding:0 4px}
+.pill.sm{padding:2px 8px;font-size:10.5px}
+
+/* ===== rodape ===== */
+footer{margin-top:28px;padding:16px 4px 0;border-top:1px solid var(--line);color:var(--mut2);font-size:11.5px;line-height:1.6}
+footer .fb{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-bottom:6px;color:var(--mut);font-weight:600}
+footer .fl{display:inline-flex;align-items:center;gap:7px;color:var(--txt);font-weight:800;font-size:13px;letter-spacing:-.2px}
+footer .fl svg{display:block;flex:none}
+footer p{margin:0;max-width:780px}
 </style>
 </head>
 <body>
@@ -148,19 +204,24 @@ footer{color:var(--mut2);font-size:11.5px;line-height:1.55;margin-top:20px;paddi
   </div>
 
   <div class="card">
-    <div class="ch"><h2>Curva do saldo</h2><span class="tag2">USD</span></div>
-    <div class="curvebox"><svg id="curva" viewBox="0 0 1000 240" preserveAspectRatio="none"></svg></div>
-    <div id="curvaleg" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:#8b93a1"></div>
+    <div class="ch"><h2>Curva do saldo</h2>
+      <div class="seg" id="rng" role="group" aria-label="Período do gráfico"><button type="button" data-r="all" class="on" aria-pressed="true">Tudo</button><button type="button" data-r="7d" aria-pressed="false">7 dias</button><button type="button" data-r="1d" aria-pressed="false">Hoje</button></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="curvebox"><div id="curva"></div><div class="ctip" id="ctip"></div></div>
+    <div id="curvaleg" class="cleg"></div>
   </div>
 
   <div class="card">
-    <div class="ch"><h2>Histórico de operações</h2><span class="tag2">Mais recentes primeiro</span></div>
-    <div class="tw"><table>
-      <thead><tr><th>Entrada</th><th>Saída</th><th>Lado</th><th>Canal</th><th class="n">Preço entrada</th><th class="n">Preço saída</th><th>Resultado</th><th class="n">Lucro</th></tr></thead>
-      <tbody id="ops"></tbody></table></div>
+    <div class="ch"><h2>Histórico de operações</h2><span class="tag2" id="histn">—</span></div>
+    <div id="ops"></div>
+    <button type="button" class="more" id="mais" hidden>Ver mais</button>
   </div>
 
-  <footer>Dados lidos da conta MetaTrader 5 a cada minuto, com até ~2–3 min de atraso. Horários no fuso do seu aparelho. Resultados passados não garantem resultados futuros. Não é recomendação de investimento.</footer>
+  <footer>
+    <div class="fb"><span class="fl"><svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#f7c331"/><path d="M6.5 23h19l-3.3-8.5H9.8z" fill="#0d0e11"/></svg>Bullion</span><span>Robô FIMATHE · XAUUSD · MetaTrader 5</span></div>
+    <p>Dados lidos da conta MetaTrader 5 a cada minuto, com até ~2–3 min de atraso. Horários no fuso do seu aparelho. Resultados passados não garantem resultados futuros. Não é recomendação de investimento.</p>
+  </footer>
 </div>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
@@ -272,28 +333,189 @@ function render(d) {
     </div>`;
   }).join("") : "Nenhuma operação aberta. O robô está esperando o próximo sinal.";
 
-  $("ops").innerHTML = ops.slice().reverse().map(o => `<tr><td>${dt(o.entrada)}</td><td>${dt(o.saida)}</td>
-    <td><span class="pill ${o.lado === "Compra" ? "a" : "s"}">${o.lado}</span></td><td>${o.canal}</td><td class="n">${o.preco_entrada}</td><td class="n">${o.preco_saida}</td>
-    <td><span class="pill ${o.resultado === "Alvo" ? "a" : o.resultado === "Stop" ? "s" : "o"}">${o.resultado}</span></td>
-    <td class="n ${cls(o.lucro)}">${sgn(o.lucro)}</td></tr>`).join("");
-
-  // curva do saldo: base + soma dos lucros; ultimo ponto = patrimonio ao vivo
-  let s = d.base; const pts = [s]; ops.forEach(o => pts.push(s += o.lucro));
-  if (abertas.length) pts.push(d.patrimonio);
-  const mn = Math.min(...pts), mx = Math.max(...pts), pad = (mx - mn) * 0.12 || 10;
-  const X = i => 10 + 980 * i / Math.max(1, pts.length - 1), Y = v => 225 - 210 * (v - mn + pad) / (mx - mn + 2 * pad);
-  const path = pts.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join("");
-  $("curva").innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.acc}" stop-opacity=".32"/><stop offset="1" stop-color="${C.acc}" stop-opacity="0"/></linearGradient></defs>
-    <line x1="0" x2="1000" y1="${Y(d.base)}" y2="${Y(d.base)}" stroke="#3a3f4a" stroke-dasharray="6 6" vector-effect="non-scaling-stroke"/>
-    <path d="${path}L${X(pts.length - 1)} 240L${X(0)} 240Z" fill="url(#g)"/>
-    <path d="${path}" fill="none" stroke="${C.acc}" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    ${pts.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="4" fill="${v >= pts[i] ? C.up : C.dn}" stroke="#121419" stroke-width="1.5"/>`).join("")}`;
-  const ult = ops.length ? ops[ops.length - 1] : null, fim = pts[pts.length - 1];
-  const dm = s => new Date(s).toLocaleString("pt-BR", {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"});
-  $("curvaleg").innerHTML = `<span>Início ${d.inicio.split("-").reverse().slice(0, 2).join("/")}: <b style="color:#e8eaed">$${d.base.toFixed(2)}</b></span>` +
-    (ult ? `<span>Última operação ${dm(ult.saida)}: <b class="${ult.lucro >= 0 ? "up" : "dn"}">${ult.lucro >= 0 ? "+" : "-"}$${Math.abs(ult.lucro).toFixed(2)}</b></span>` : "") +
-    `<span>${abertas.length ? "Agora (com operação aberta)" : "Agora"}: <b style="color:#e8eaed">$${fim.toFixed(2)}</b> · atualizado ${dm(d.enviado)}</span>`;
+  // parte de baixo: indicadores + curva do saldo + historico
+  drawStats(d, ops, abertas);
+  drawCurve(d, abertas);
+  drawHist(ops);
 }
+
+// ===== parte de baixo =====
+let cv = null, cvs = null, cvBaseLine = null, cvPts = [], cvMap = new Map(), cvBase = 0, cvRange = "all", histDays = 3;
+const pct = v => (v > 0 ? "+" : v < 0 ? "-" : "") + Math.abs(v).toLocaleString("pt-BR", {minimumFractionDigits: 1, maximumFractionDigits: 1}) + "%";
+const hm = s => new Date(s).toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"});
+const p2 = n => String(n).padStart(2, "0");
+const dkey = s => { const x = new Date(s); return x.getFullYear() + "-" + p2(x.getMonth() + 1) + "-" + p2(x.getDate()); };
+const ddm = k => k.slice(8, 10) + "/" + k.slice(5, 7);
+const fx = (t, o) => new Date(t * 1000).toLocaleString("pt-BR", Object.assign({timeZone: "UTC"}, o)); // tempo ja deslocado p/ o fuso local
+const dur = (a, b) => { const m = Math.max(0, Math.round((Date.parse(b) - Date.parse(a)) / 60000)); return m < 60 ? m + " min" : Math.floor(m / 60) + "h" + p2(m % 60); };
+const px2 = v => (v == null || isNaN(v)) ? "—" : (+v).toFixed(2);
+const bySaida = (a, b) => Date.parse(a.saida) - Date.parse(b.saida);
+function dayLabel(k) {
+  const now = new Date(), ont = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  if (k === dkey(now)) return "Hoje, " + ddm(k);
+  if (k === dkey(ont)) return "Ontem, " + ddm(k);
+  const w = new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8, 10)).toLocaleDateString("pt-BR", {weekday: "short"}).replace(".", "");
+  return w.charAt(0).toUpperCase() + w.slice(1) + ", " + ddm(k);
+}
+
+function drawStats(d, ops, abertas) {
+  const lucro = d.saldo - d.base;
+  let pk = d.base, b = d.base, dd = 0, ddp = 0;
+  const seq = ops.slice().sort(bySaida).map(o => b += o.lucro);
+  if (abertas.length) seq.push(d.patrimonio);
+  seq.forEach(v => { if (v > pk) pk = v; if (pk - v > dd) { dd = pk - v; ddp = 100 * dd / pk; } });
+  const days = {}; ops.forEach(o => { const k = dkey(o.saida); days[k] = (days[k] || 0) + o.lucro; });
+  let best = null, worst = null;
+  Object.keys(days).forEach(k => { if (best === null || days[k] > days[best]) best = k; if (worst === null || days[k] < days[worst]) worst = k; });
+  const w = ops.filter(o => o.lucro > 0).length, l = ops.filter(o => o.lucro < 0).length;
+  const kp = (k, v, s) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  $("kpis").innerHTML = [
+    kp("Saldo atual", usd(d.saldo), abertas.length ? `Patrimônio <b class="${cls(d.patrimonio - d.saldo)}">${usd(d.patrimonio)}</b>` : "Sem operação aberta"),
+    kp("Lucro total", `<span class="${cls(lucro)}">${sgn(lucro)}</span>`, `<b class="${cls(lucro)}">${pct(100 * lucro / d.base)}</b> desde ${ddm(d.inicio)}`),
+    kp("Máx. drawdown", dd ? `<span class="dn">${usd(-dd)}</span>` : usd(0), dd ? `<b class="dn">${pct(-ddp)}</b> a partir do pico` : "Sem recuo até agora"),
+    kp("Melhor dia", best === null ? "—" : `<span class="${cls(days[best])}">${sgn(days[best])}</span>`, best === null ? "Sem operações" : dayLabel(best)),
+    kp("Pior dia", worst === null ? "—" : `<span class="${cls(days[worst])}">${sgn(days[worst])}</span>`, worst === null ? "Sem operações" : dayLabel(worst)),
+    kp("Operações · V/D", `<span class="up">${w}</span><span class="sl">/</span><span class="dn">${l}</span>`,
+      ops.length ? `${ops.length} no total · ${Math.round(100 * w / ops.length)}% acerto` : "Nenhuma ainda"),
+  ].join("");
+}
+
+// pontos da curva: inicio do dia 'inicio' com 'base', um ponto por hora (eixo de tempo real),
+// cada saida de operacao no horario exato, e o ultimo ponto = patrimonio/saldo agora
+function curveData(d, abertas) {
+  const ev = (d.operacoes || []).map(o => ({t: Math.floor(Date.parse(o.saida) / 1000) + TZ, o}))
+    .filter(e => !isNaN(e.t)).sort((a, b) => a.t - b.t);
+  const sent = Date.parse(d.enviado), end = Math.floor((isNaN(sent) ? Date.now() : sent) / 1000) + TZ;
+  let t0 = Date.parse(d.inicio + "T00:00:00Z") / 1000;
+  if (isNaN(t0)) t0 = ev.length ? ev[0].t - 3600 : end - 86400;
+  if (ev.length && ev[0].t <= t0) t0 = ev[0].t - 60;
+  const pts = []; let bal = d.base, last = -Infinity, i = 0;
+  const push = (t, v, o, live) => { t = Math.max(t, last + 1); last = t; pts.push({time: t, value: Math.round(v * 100) / 100, o, live}); };
+  const take = h => { while (i < ev.length && ev[i].t <= h) { bal += ev[i].o.lucro; push(ev[i].t, bal, ev[i].o); i++; } };
+  push(t0, bal);
+  for (let h = Math.floor(t0 / 3600) * 3600 + 3600; h < end; h += 3600) { take(h); if (h > last) push(h, bal); }
+  take(Infinity);
+  push(end, abertas.length ? d.patrimonio : d.saldo, null, abertas.length ? "Agora · com operação aberta" : "Agora");
+  return pts;
+}
+
+function initCurve() {
+  if (cv || !window.LightweightCharts) return;
+  const el = $("curva");
+  cv = LightweightCharts.createChart(el, {
+    width: el.clientWidth || 600, height: el.clientHeight || 260,
+    layout: {background: {color: "transparent"}, textColor: C.mut, fontFamily: "Plus Jakarta Sans", fontSize: 11},
+    grid: {vertLines: {visible: false}, horzLines: {color: "rgba(38,42,51,.6)"}},
+    rightPriceScale: {borderVisible: false, scaleMargins: {top: .14, bottom: .08}},
+    timeScale: {borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true, rightOffset: 0, lockVisibleTimeRangeOnResize: true},
+    crosshair: {mode: 1, vertLine: {color: "rgba(247,195,49,.45)", width: 1, style: 2, labelBackgroundColor: "#2a2e37"},
+      horzLine: {color: "rgba(247,195,49,.3)", width: 1, style: 2, labelBackgroundColor: "#2a2e37"}},
+    handleScroll: false, handleScale: false,
+    localization: {locale: "pt-BR", timeFormatter: t => fx(t, {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})},
+  });
+  cvs = cv.addBaselineSeries({
+    baseValue: {type: "price", price: 0}, lineWidth: 2,
+    topLineColor: C.acc, topFillColor1: "rgba(247,195,49,.28)", topFillColor2: "rgba(247,195,49,.02)",
+    bottomLineColor: C.dn, bottomFillColor1: "rgba(255,84,104,.03)", bottomFillColor2: "rgba(255,84,104,.26)",
+    priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4, crosshairMarkerBorderColor: "#121419",
+    priceFormat: {type: "custom", minMove: 1, formatter: v => "$" + Math.round(v).toLocaleString("pt-BR")},
+  });
+  const fit = () => { if (el.clientWidth) cv.resize(el.clientWidth, el.clientHeight); };
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(el); else addEventListener("resize", fit);
+  cv.subscribeCrosshairMove(showTip);
+}
+
+function showTip(p) {
+  const tip = $("ctip");
+  const pt = p && p.time != null && p.point && p.point.x >= 0 ? cvMap.get(p.time) : null;
+  if (!pt) { tip.classList.remove("on"); return; }
+  const ch = pt.value - cvBase;
+  tip.innerHTML = `<div>${fx(pt.time, {weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})}</div>
+    <div class="b">${usd(pt.value)}</div>
+    <div class="r"><span>Desde o início</span><span class="${cls(ch)}">${sgn(ch)} · ${pct(100 * ch / cvBase)}</span></div>` +
+    (pt.o ? `<div class="r"><span>${pt.o.lado} · ${pt.o.resultado}</span><span class="${cls(pt.o.lucro)}">${sgn(pt.o.lucro)}</span></div>` : "") +
+    (pt.live ? `<div class="r"><span style="color:var(--acc)">${pt.live}</span></div>` : "");
+  const bw = tip.parentElement.clientWidth, tw = tip.offsetWidth, x0 = p.point.x + 4;
+  let x = x0 + 16; if (x + tw > bw - 6) x = x0 - tw - 16;
+  tip.style.left = Math.max(6, Math.min(x, bw - tw - 6)) + "px";
+  tip.classList.add("on");
+}
+
+function rangeFrom(end) {
+  return cvRange === "7d" ? end - 7 * 86400 : cvRange === "1d" ? Math.floor(end / 86400) * 86400 : -Infinity;
+}
+function applyRange() {
+  if (!cv || !cvPts.length) return;
+  const end = cvPts[cvPts.length - 1].time, from = rangeFrom(end), ts = cv.timeScale();
+  if (from <= cvPts[0].time) ts.fitContent(); else ts.setVisibleRange({from, to: end});
+}
+function drawLeg() {
+  if (!cvPts.length) return;
+  const end = cvPts[cvPts.length - 1], from = rangeFrom(end.time);
+  let st = cvPts[0]; for (const p of cvPts) { if (p.time <= from) st = p; else break; }
+  const ch = end.value - st.value, lab = {all: "Desde o início", "7d": "Últimos 7 dias", "1d": "Hoje"}[cvRange];
+  $("curvaleg").innerHTML = `<span class="l"><span><i class="lgl"></i>Saldo</span><span class="up"><i class="lgd"></i><span style="color:var(--mut)">Ganho</span></span><span class="dn"><i class="lgd"></i><span style="color:var(--mut)">Perda</span></span></span>` +
+    `<span>${lab}: <b class="${cls(ch)}">${sgn(ch)} (${pct(st.value ? 100 * ch / st.value : 0)})</b></span>`;
+}
+function drawCurve(d, abertas) {
+  cvPts = curveData(d, abertas); cvBase = d.base;
+  cvMap = new Map(cvPts.map(p => [p.time, p]));
+  initCurve();
+  if (cvs) {
+    cvs.applyOptions({baseValue: {type: "price", price: d.base - 0.01}}); // saldo = base fica dourado
+    if (cvBaseLine) cvBaseLine.applyOptions({price: d.base});
+    else cvBaseLine = cvs.createPriceLine({price: d.base, color: "#4b515d", lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: ""});
+    cvs.setData(cvPts.map(p => ({time: p.time, value: p.value})));
+    cvs.setMarkers(cvPts.filter(p => p.o).map(p => ({time: p.time, position: "inBar", shape: "circle", size: 0.5, color: p.o.lucro >= 0 ? C.up : C.dn})));
+    applyRange();
+  }
+  drawLeg();
+}
+
+function drawHist(ops) {
+  const byDay = new Map();
+  ops.slice().sort((a, b) => bySaida(b, a)).forEach(o => { const k = dkey(o.saida); if (!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(o); });
+  const days = [...byDay.entries()], mais = $("mais");
+  $("histn").textContent = ops.length ? `${ops.length} operaç${ops.length > 1 ? "ões" : "ão"} · ${days.length} dia${days.length > 1 ? "s" : ""}` : "—";
+  if (!ops.length) { $("ops").innerHTML = `<div class="none">Nenhuma operação fechada ainda.</div>`; mais.hidden = true; return; }
+  const show = days.slice(0, histDays);
+  const lp = o => o.lado === "Compra" ? "a" : "s", rp = o => o.resultado === "Alvo" ? "a" : o.resultado === "Stop" ? "s" : "o";
+  const hr = o => (dkey(o.entrada) === dkey(o.saida) ? hm(o.entrada) : dt(o.entrada)) + " → " + hm(o.saida);
+  const lot = o => o.lote != null ? (+o.lote).toFixed(2) : "—";
+  const tot = list => list.reduce((s, o) => s + o.lucro, 0);
+  const nop = n => n + (n > 1 ? " operações" : " operação");
+  const cards = show.map(([k, list]) => { const t = tot(list);
+    return `<section class="hday"><div class="dh"><span><b>${dayLabel(k)}</b><span class="c">${nop(list.length)}</span></span><span class="t ${cls(t)}">${sgn(t)}</span></div>
+    <div class="tlist">${list.map(o => `<div class="tc">
+      <div style="min-width:0"><div class="t1"><span class="pill sm ${lp(o)}">${o.lado}</span><span class="mono tm">${hr(o)}</span><span class="du">${dur(o.entrada, o.saida)}</span></div>
+        <div class="cn">${o.canal}</div>
+        <div class="mono pr">${px2(o.preco_entrada)} → ${px2(o.preco_saida)} · ${lot(o)} lote</div></div>
+      <div class="tv"><div class="pl ${cls(o.lucro)}">${sgn(o.lucro)}</div><span class="pill sm ${rp(o)}">${o.resultado}</span></div>
+    </div>`).join("")}</div></section>`; }).join("");
+  const rows = show.map(([k, list]) => { const t = tot(list);
+    return `<tr class="dr"><td colspan="7"><b>${dayLabel(k)}</b>${nop(list.length)}</td><td class="n ${cls(t)}">${sgn(t)}</td></tr>` +
+      list.map((o, i) => `<tr class="r${i % 2 ? " z" : ""}"><td class="mono">${hr(o)}<span class="du">${dur(o.entrada, o.saida)}</span></td>
+        <td><span class="pill sm ${lp(o)}">${o.lado}</span></td><td class="cn2">${o.canal}</td><td class="n">${lot(o)}</td>
+        <td class="n">${px2(o.preco_entrada)}</td><td class="n">${px2(o.preco_saida)}</td>
+        <td><span class="pill sm ${rp(o)}">${o.resultado}</span></td><td class="n pl ${cls(o.lucro)}">${sgn(o.lucro)}</td></tr>`).join(""); }).join("");
+  $("ops").innerHTML = `<div class="hm">${cards}</div><div class="hd"><table class="ht"><thead><tr><th>Horário</th><th>Lado</th><th>Canal</th><th class="n">Lote</th><th class="n">Preço entrada</th><th class="n">Preço saída</th><th>Resultado</th><th class="n">Lucro</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const rest = days.length - show.length;
+  mais.hidden = rest <= 0 && days.length <= 3;
+  mais.dataset.m = rest > 0 ? "more" : "less";
+  mais.textContent = rest > 0 ? `Ver mais · ${rest} dia${rest > 1 ? "s" : ""} anterior${rest > 1 ? "es" : ""}` : "Ver menos";
+}
+
+$("rng").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  cvRange = b.dataset.r;
+  [...$("rng").children].forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+  applyRange(); drawLeg();
+});
+$("mais").addEventListener("click", () => {
+  if ($("mais").dataset.m === "less") { histDays = 3; $("ops").closest(".card").scrollIntoView({block: "start"}); }
+  else histDays += 5;
+  if (data) drawHist(data.operacoes || []);
+});
 
 // faixa corrida: anda sozinha e pode ser arrastada para os dois lados (mouse ou dedo)
 const tk = {x: 0, drag: false, lx: 0, lt: 0, v: 0, last: 0};
