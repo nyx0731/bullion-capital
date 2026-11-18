@@ -383,22 +383,22 @@ function drawStats(d, ops, abertas) {
 // pontos da curva: inicio do dia 'inicio' com 'base', um ponto por hora (eixo de tempo real),
 // cada saida de operacao no horario exato, e o ultimo ponto = patrimonio/saldo agora
 function curveData(d, abertas) {
-  const ev = (d.operacoes || []).map(o => ({t: Math.floor(Date.parse(o.saida) / 1000) + TZ, o}))
-    .filter(e => !isNaN(e.t)).sort((a, b) => a.t - b.t);
-  const sent = Date.parse(d.enviado), end = Math.floor((isNaN(sent) ? Date.now() : sent) / 1000) + TZ;
-  let t0 = Date.parse(d.inicio + "T00:00:00Z") / 1000;
-  if (isNaN(t0)) t0 = ev.length ? ev[0].t - 3600 : end - 86400;
-  if (ev.length && ev[0].t <= t0) t0 = ev[0].t - 60;
-  const pts = []; let bal = d.base, last = -Infinity, i = 0;
-  const push = (t, v, o, live) => { t = Math.max(t, last + 1); last = t; pts.push({time: t, value: Math.round(v * 100) / 100, o, live}); };
-  const take = h => { while (i < ev.length && ev[i].t <= h) { bal += ev[i].o.lucro; push(ev[i].t, bal, ev[i].o); i++; } };
-  push(t0, bal);
-  for (let h = Math.floor(t0 / 3600) * 3600 + 3600; h < end; h += 3600) { take(h); if (h > last) push(h, bal); }
-  take(Infinity);
-  push(end, abertas.length ? d.patrimonio : d.saldo, null, abertas.length ? "Agora · com operação aberta" : "Agora");
+  // um ponto por dia (saldo no fim do dia); cor = dia positivo/negativo
+  const days = new Map();
+  (d.operacoes || []).slice().sort(bySaida).forEach(o => { const k = dkey(o.saida); if (!days.has(k)) days.set(k, {sum: 0, n: 0}); const x = days.get(k); x.sum += o.lucro; x.n++; });
+  const tk = k => Date.UTC(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8, 10)) / 1000;
+  const today = dkey(new Date()), pts = []; let bal = d.base;
+  const k0 = d.inicio, keys = [...days.keys()].sort();
+  const start = keys.length && keys[0] <= k0 ? tk(keys[0]) - 86400 : tk(k0) - 86400;
+  pts.push({time: start, value: bal});
+  keys.forEach(k => { const x = days.get(k); bal += x.sum; pts.push({time: tk(k), value: Math.round(bal * 100) / 100, day: x}); });
+  if (abertas.length) {
+    const last = pts[pts.length - 1], v = Math.round(d.patrimonio * 100) / 100;
+    if (last.time === tk(today)) { last.value = v; last.live = "Hoje · com operação aberta"; }
+    else pts.push({time: tk(today), value: v, live: "Hoje · com operação aberta", day: {sum: v - bal, n: 0}});
+  }
   return pts;
 }
-
 function initCurve() {
   if (cv || !window.LightweightCharts) return;
   const el = $("curva");
@@ -407,11 +407,11 @@ function initCurve() {
     layout: {background: {color: "transparent"}, textColor: C.mut, fontFamily: "Plus Jakarta Sans", fontSize: 11},
     grid: {vertLines: {visible: false}, horzLines: {color: "rgba(38,42,51,.6)"}},
     rightPriceScale: {borderVisible: false, scaleMargins: {top: .14, bottom: .08}},
-    timeScale: {borderVisible: false, timeVisible: true, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true, rightOffset: 0, lockVisibleTimeRangeOnResize: true},
+    timeScale: {borderVisible: false, timeVisible: false, secondsVisible: false, fixLeftEdge: true, fixRightEdge: true, rightOffset: 0, lockVisibleTimeRangeOnResize: true},
     crosshair: {mode: 1, vertLine: {color: "rgba(247,195,49,.45)", width: 1, style: 2, labelBackgroundColor: "#2a2e37"},
       horzLine: {color: "rgba(247,195,49,.3)", width: 1, style: 2, labelBackgroundColor: "#2a2e37"}},
     handleScroll: false, handleScale: false,
-    localization: {locale: "pt-BR", timeFormatter: t => fx(t, {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})},
+    localization: {locale: "pt-BR", timeFormatter: t => fx(t, {day: "2-digit", month: "2-digit"})},
   });
   cvs = cv.addBaselineSeries({
     baseValue: {type: "price", price: 0}, lineWidth: 2,
@@ -430,10 +430,10 @@ function showTip(p) {
   const pt = p && p.time != null && p.point && p.point.x >= 0 ? cvMap.get(p.time) : null;
   if (!pt) { tip.classList.remove("on"); return; }
   const ch = pt.value - cvBase;
-  tip.innerHTML = `<div>${fx(pt.time, {weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})}</div>
+  tip.innerHTML = `<div>${fx(pt.time, {weekday: "short", day: "2-digit", month: "2-digit"})}</div>
     <div class="b">${usd(pt.value)}</div>
     <div class="r"><span>Desde o início</span><span class="${cls(ch)}">${sgn(ch)} · ${pct(100 * ch / cvBase)}</span></div>` +
-    (pt.o ? `<div class="r"><span>${pt.o.lado} · ${pt.o.resultado}</span><span class="${cls(pt.o.lucro)}">${sgn(pt.o.lucro)}</span></div>` : "") +
+    (pt.day && pt.day.n ? `<div class="r"><span>Resultado do dia · ${pt.day.n} op.</span><span class="${cls(pt.day.sum)}">${sgn(pt.day.sum)}</span></div>` : "") +
     (pt.live ? `<div class="r"><span style="color:var(--acc)">${pt.live}</span></div>` : "");
   const bw = tip.parentElement.clientWidth, tw = tip.offsetWidth, x0 = p.point.x + 4;
   let x = x0 + 16; if (x + tw > bw - 6) x = x0 - tw - 16;
@@ -442,7 +442,7 @@ function showTip(p) {
 }
 
 function rangeFrom(end) {
-  return cvRange === "7d" ? end - 7 * 86400 : cvRange === "1d" ? Math.floor(end / 86400) * 86400 : -Infinity;
+  return cvRange === "7d" ? end - 7 * 86400 : cvRange === "1d" ? end - 86400 : -Infinity;
 }
 function applyRange() {
   if (!cv || !cvPts.length) return;
@@ -466,7 +466,7 @@ function drawCurve(d, abertas) {
     if (cvBaseLine) cvBaseLine.applyOptions({price: d.base});
     else cvBaseLine = cvs.createPriceLine({price: d.base, color: "#4b515d", lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: ""});
     cvs.setData(cvPts.map(p => ({time: p.time, value: p.value})));
-    cvs.setMarkers(cvPts.filter(p => p.o).map(p => ({time: p.time, position: "inBar", shape: "circle", size: 0.5, color: p.o.lucro >= 0 ? C.up : C.dn})));
+    cvs.setMarkers(cvPts.filter(p => p.day).map(p => ({time: p.time, position: "inBar", shape: "circle", size: 1, color: p.day.sum >= 0 ? C.up : C.dn})));
     applyRange();
   }
   drawLeg();
