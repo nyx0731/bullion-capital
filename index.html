@@ -197,8 +197,9 @@ footer p{margin:0;max-width:780px}
   </div>
 
   <div class="card chartc">
-    <div class="ch"><h2>Gráfico do ouro · 15 minutos</h2>
-      <div class="leg"><span><i style="background:#f7c331"></i>Canal de abertura do dia</span><span><i style="background:#1fcf8f"></i>Alvo</span><span><i style="background:#ff5468"></i>Stop</span></div>
+    <div class="ch"><h2 id="chtitle">Gráfico do ouro · 15 minutos</h2>
+      <div class="seg" id="tfs" role="group" aria-label="Tempo gráfico"><button type="button" data-tf="d1" aria-pressed="false">D1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button><button type="button" data-tf="m15" class="on" aria-pressed="true">M15</button><button type="button" data-tf="m5" aria-pressed="false">M5</button></div>
+      <div class="leg" style="flex-basis:100%"><span id="legca"><i style="background:#f7c331"></i>Canal de abertura do dia</span><span><i style="background:#1fcf8f"></i>Alvo</span><span><i style="background:#ff5468"></i>Stop</span></div>
     </div>
     <div class="chartbox"><div id="chart"></div></div>
   </div>
@@ -245,28 +246,77 @@ function initChart() {
   series = chart.addCandlestickSeries({upColor: C.up, downColor: C.dn, borderVisible: false,
     wickUpColor: C.up, wickDownColor: C.dn});
 }
+// tempos graficos: D1 vem com t = meia-noite do servidor -> tratado como data (sem TZ)
+const TF = {d1: {lab: "Diário", want: 85}, h4: {lab: "4 horas", want: 90}, m15: {lab: "15 minutos", want: 192}, m5: {lab: "5 minutos", want: 288}};
+let tf = "m15", shownTf = null;
+try { const s = localStorage.getItem("fimTf"); if (TF[s]) tf = s; } catch (e) {}
+const hasTf = (d, k) => Array.isArray(d[k]) && d[k].length > 0;
+function tfBars(d, k) {
+  const out = []; let prev = -Infinity;
+  d[k].filter(c => Array.isArray(c) && c.length >= 5).slice().sort((a, b) => a[0] - b[0]).forEach(c => {
+    const t = k === "d1" ? Math.round(c[0] / 86400) * 86400 : c[0] + TZ;
+    if (t > prev) { out.push({time: t, open: +c[1], high: +c[2], low: +c[3], close: +c[4]}); prev = t; }
+  });
+  return out;
+}
+function syncTfUi(k) {
+  document.getElementById("chtitle").textContent = "Gráfico do ouro · " + TF[k].lab;
+  document.querySelectorAll("#tfs button").forEach(b => { const on = b.dataset.tf === k;
+    b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+  document.getElementById("legca").style.display = (k === "m5" || k === "m15") ? "" : "none";
+}
 function drawChart(d) {
   initChart();
-  if (!series || !d.m15 || !d.m15.length) return;
-  series.setData(d.m15.map(c => ({time: c[0] + TZ, open: c[1], high: c[2], low: c[3], close: c[4]})));
+  if (!series) return;
+  document.querySelectorAll("#tfs button").forEach(b => { b.hidden = !hasTf(d, b.dataset.tf); });
+  const k = hasTf(d, tf) ? tf : "m15";
+  if (!hasTf(d, k)) return;
+  const bars = tfBars(d, k);
+  if (!bars.length) return;
+  syncTfUi(k);
+  const sw = k !== shownTf;
+  if (sw) { series.setMarkers([]); chart.applyOptions({timeScale: {timeVisible: k !== "d1"}}); }
+  series.setData(bars);
   plines.forEach(l => series.removePriceLine(l)); plines = [];
   const add = (price, color, title, style) => plines.push(series.createPriceLine({price, color, title, lineWidth: 1, lineStyle: style, axisLabelVisible: true}));
-  if (d.ca) { add(d.ca.topo, C.acc, "Topo do canal", 0); add(d.ca.fundo, C.acc, "Fundo do canal", 0); }
+  if (d.ca && (k === "m5" || k === "m15")) { add(d.ca.topo, C.acc, "Topo do canal", 0); add(d.ca.fundo, C.acc, "Fundo do canal", 0); }
   (d.abertas || []).forEach(p => {
     add(p.preco_entrada, C.acc2, p.lado + " " + p.preco_entrada, 2);
     add(p.tp, C.up, "Alvo", 2); add(p.sl, C.dn, "Stop", 2);
   });
-  const t0 = d.m15[0][0], q = s => Math.floor((Date.parse(s) / 1000) / 900) * 900 + TZ;
+  // marcador vai para a barra (existente) que contem o horario; D1 usa a data local do trade
+  const times = bars.map(b => b.time);
+  const q = s => {
+    const ms = Date.parse(s); if (isNaN(ms)) return null;
+    let x; if (k === "d1") { const z = new Date(ms); x = Date.UTC(z.getFullYear(), z.getMonth(), z.getDate()) / 1000; } else x = ms / 1000 + TZ;
+    if (x < times[0]) return null;
+    let lo = 0, hi = times.length - 1;
+    while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (times[mid] <= x) lo = mid; else hi = mid - 1; }
+    return times[lo];
+  };
   const mk = [];
-  (d.operacoes || []).filter(o => Date.parse(o.saida) / 1000 >= t0).forEach(o => {
-    const buy = o.lado === "Compra";
-    if (Date.parse(o.entrada) / 1000 >= t0) mk.push({time: q(o.entrada), position: buy ? "belowBar" : "aboveBar", color: buy ? C.up : C.dn, shape: buy ? "arrowUp" : "arrowDown", text: o.lado});
-    mk.push({time: q(o.saida), position: "aboveBar", color: o.lucro >= 0 ? C.up : C.dn, shape: "circle", text: (o.lucro >= 0 ? "+" : "") + o.lucro.toFixed(0)});
+  (d.operacoes || []).forEach(o => {
+    const ts = q(o.saida); if (ts === null) return;
+    const buy = o.lado === "Compra", te = q(o.entrada);
+    if (te !== null) mk.push({time: te, position: buy ? "belowBar" : "aboveBar", color: buy ? C.up : C.dn, shape: buy ? "arrowUp" : "arrowDown", text: o.lado});
+    mk.push({time: ts, position: "aboveBar", color: o.lucro >= 0 ? C.up : C.dn, shape: "circle", text: (o.lucro >= 0 ? "+" : "") + o.lucro.toFixed(0)});
   });
-  (d.abertas || []).forEach(p => { const buy = p.lado === "Compra";
-    mk.push({time: q(p.entrada), position: buy ? "belowBar" : "aboveBar", color: C.acc2, shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
+  (d.abertas || []).forEach(p => { const te = q(p.entrada); if (te === null) return; const buy = p.lado === "Compra";
+    mk.push({time: te, position: buy ? "belowBar" : "aboveBar", color: C.acc2, shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
   series.setMarkers(mk.sort((a, b) => a.time - b.time));
+  if (sw) {
+    const w = document.getElementById("chart").clientWidth || 800, n = Math.max(20, Math.min(TF[k].want, Math.floor(w / 2.5)));
+    chart.timeScale().setVisibleLogicalRange({from: bars.length - n, to: bars.length - 1 + 4});
+    shownTf = k;
+  }
 }
+syncTfUi(tf);
+document.getElementById("tfs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tf]"); if (!b || b.hidden || !TF[b.dataset.tf]) return;
+  tf = b.dataset.tf;
+  try { localStorage.setItem("fimTf", tf); } catch (err) {}
+  if (data && data.saldo !== undefined) drawChart(data); else syncTfUi(tf);
+});
 const GIST = "71311f75b9108ad18027bebe14ecc19c";
 const $ = id => document.getElementById(id);
 const usd = v => (v < 0 ? "-" : "") + "$" + Math.abs(v).toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
