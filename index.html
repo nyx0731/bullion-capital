@@ -199,6 +199,7 @@ footer p{margin:0;max-width:780px}
   <div class="card chartc">
     <div class="ch"><h2 id="chtitle">Gráfico do ouro · 15 minutos</h2>
       <div class="seg" id="tfs" role="group" aria-label="Tempo gráfico"><button type="button" data-tf="d1" aria-pressed="false">D1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button><button type="button" data-tf="m15" class="on" aria-pressed="true">M15</button><button type="button" data-tf="m5" aria-pressed="false">M5</button></div>
+      <div class="seg" id="ordseg" role="group" aria-label="Ordens no gráfico"><button type="button" id="ordbtn" class="on" aria-pressed="true">Ordens: ON</button></div>
       <div class="leg" style="flex-basis:100%"><span id="legca"><i style="background:#f7c331"></i>Canal de abertura do dia</span><span><i style="background:#1fcf8f"></i>Alvo</span><span><i style="background:#ff5468"></i>Stop</span></div>
     </div>
     <div class="chartbox"><div id="chart"></div></div>
@@ -280,7 +281,7 @@ function drawChart(d) {
   plines.forEach(l => series.removePriceLine(l)); plines = [];
   const add = (price, color, title, style) => plines.push(series.createPriceLine({price, color, title, lineWidth: 1, lineStyle: style, axisLabelVisible: true}));
   if (d.ca && (k === "m5" || k === "m15")) { add(d.ca.topo, C.acc, "Topo do canal", 0); add(d.ca.fundo, C.acc, "Fundo do canal", 0); }
-  (d.abertas || []).forEach(p => {
+  if (showOrd) (d.abertas || []).forEach(p => {
     add(p.preco_entrada, C.acc2, p.lado + " " + p.preco_entrada, 2);
     add(p.tp, C.up, "Alvo", 2); add(p.sl, C.dn, "Stop", 2);
   });
@@ -303,13 +304,21 @@ function drawChart(d) {
   });
   (d.abertas || []).forEach(p => { const te = q(p.entrada); if (te === null) return; const buy = p.lado === "Compra";
     mk.push({time: te, position: buy ? "belowBar" : "aboveBar", color: C.acc2, shape: buy ? "arrowUp" : "arrowDown", text: p.lado + " (aberta)"}); });
-  series.setMarkers(mk.sort((a, b) => a.time - b.time));
+  series.setMarkers(showOrd ? mk.sort((a, b) => a.time - b.time) : []);
   if (sw) {
     const w = document.getElementById("chart").clientWidth || 800, n = Math.max(20, Math.min(TF[k].want, Math.floor(w / 2.5)));
     chart.timeScale().setVisibleLogicalRange({from: bars.length - n, to: bars.length - 1 + 4});
     shownTf = k;
   }
 }
+// botao para mostrar/esconder as ordens (setas, resultados, entrada/stop/alvo) no grafico
+let showOrd = true; try { showOrd = localStorage.getItem("fimOrd") !== "0"; } catch (err) {}
+function syncOrdUi() { const b = document.getElementById("ordbtn"); b.classList.toggle("on", showOrd); b.setAttribute("aria-pressed", showOrd ? "true" : "false"); b.textContent = "Ordens: " + (showOrd ? "ON" : "OFF"); }
+syncOrdUi();
+document.getElementById("ordbtn").addEventListener("click", () => {
+  showOrd = !showOrd; try { localStorage.setItem("fimOrd", showOrd ? "1" : "0"); } catch (err) {}
+  syncOrdUi(); if (data && data.saldo !== undefined) drawChart(data);
+});
 syncTfUi(tf);
 document.getElementById("tfs").addEventListener("click", e => {
   const b = e.target.closest("button[data-tf]"); if (!b || b.hidden || !TF[b.dataset.tf]) return;
